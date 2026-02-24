@@ -3,12 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-    <title>Apartment Tycoon (Mobile Multiplayer Prototype)</title>
+    <title>Apartment Tycoon (Snake Board)</title>
     <style>
         :root {
             --bg: #0f1220;
             --panel: #171b2e;
-            --panel2: #1e2440;
             --text: #e9ecff;
             --muted: #a9b0d9;
             --good: #45d483;
@@ -55,6 +54,8 @@
                 display: flex;
                 gap: 8px;
                 align-items: center;
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
 
         button {
@@ -94,14 +95,14 @@
                 cursor: not-allowed;
             }
 
-        input[type="number"], input[type="text"] {
+        input[type="number"] {
             background: rgba(255,255,255,.06);
             border: 1px solid rgba(255,255,255,.18);
             color: var(--text);
             border-radius: 12px;
             padding: 10px 12px;
             outline: none;
-            width: 120px;
+            width: 130px;
             max-width: 100%;
         }
 
@@ -186,7 +187,6 @@
             margin: 12px 0;
         }
 
-        /* Tabs (mobile-first) */
         .tabs {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -218,7 +218,6 @@
                 display: block;
             }
 
-        /* Board canvas */
         canvas {
             width: 100%;
             height: 58vh;
@@ -229,7 +228,6 @@
             touch-action: none;
         }
 
-        /* Lists */
         .list {
             max-height: 340px;
             overflow: auto;
@@ -302,7 +300,6 @@
             color: var(--warn);
         }
 
-        /* Players */
         .players {
             display: flex;
             flex-direction: column;
@@ -362,19 +359,6 @@
                 grid-template-columns: 1fr;
             }
 
-            header {
-                align-items: flex-start;
-            }
-
-                header .right {
-                    flex-wrap: wrap;
-                    justify-content: flex-end;
-                }
-
-            button {
-                width: auto;
-            }
-
             input[type="number"] {
                 width: 100%;
             }
@@ -385,8 +369,10 @@
 <body>
     <header>
         <div>
-            <h1>Apartment Tycoon <span class="sub">(mobile pass-and-play)</span></h1>
-            <div class="sub">60 spaces • unique-color sets • set sizes 2–3 • Apartment + Building cards • bed upgrades</div>
+            <h1>Apartment Tycoon <span class="sub">(snake board • doors • penthouse)</span></h1>
+            <div class="sub">
+                Start bottom-left → snake upward → end top-left (Elevator) → drop to Lobby • pass Lobby +$1,000 • beds max 4
+            </div>
         </div>
         <div class="right">
             <button class="secondary" id="btnNew">New Game</button>
@@ -402,7 +388,6 @@
             <button class="tabBtn" data-tab="log">Log</button>
         </div>
 
-        <!-- BOARD TAB -->
         <section class="card tabPanel active" id="tab-board">
             <div class="hd">
                 <div class="title">Board</div>
@@ -414,18 +399,18 @@
             <canvas id="board" width="1200" height="740"></canvas>
             <div class="bd">
                 <div class="hint">
-                    Beds: 0 Bare → 5 Luxury. Own a full set (2–3 units) for a rent bonus.
+                    The left side is the <b>Elevator shaft</b>. Top-left elevator door drops to Lobby. Speakeasy is in Penthouse floors.
                 </div>
             </div>
         </section>
 
-        <!-- ACTIONS TAB -->
         <section class="card tabPanel" id="tab-actions" style="margin-top:12px;">
             <div class="hd">
                 <div class="title">Actions</div>
                 <div class="row">
-                    <span class="pill">Beds: <b>0–5</b></span>
-                    <span class="pill">Pass Start: <b>$200</b></span>
+                    <span class="pill">Start Cash: <b>$4,500</b></span>
+                    <span class="pill">Pass Lobby: <b>$1,000</b></span>
+                    <span class="pill">Beds max: <b>4</b></span>
                 </div>
             </div>
             <div class="bd">
@@ -441,7 +426,7 @@
                             </div>
                             <div class="row" style="margin-top:10px;">
                                 <label>Starting cash</label>
-                                <input type="number" id="startCash" min="500" step="100" value="1500" />
+                                <input type="number" id="startCash" min="1000" step="100" value="4500" />
                             </div>
                             <div class="row" style="margin-top:12px;">
                                 <button class="good" id="btnStart">Start</button>
@@ -449,15 +434,14 @@
                         </div>
 
                         <div class="listItem">
-                            <div class="big">Rules (prototype)</div>
+                            <div class="big">Core Rules</div>
                             <div class="mini">
                                 <ul style="margin:8px 0 0 18px; padding:0;">
-                                    <li>Roll → move → resolve space.</li>
-                                    <li>Unowned apartment: you can Buy.</li>
-                                    <li>Owned by someone else: rent auto-paid.</li>
-                                    <li>Upgrade: beds 0→5, increases rent.</li>
-                                    <li>Complete a set: rent bonus.</li>
-                                    <li>Apartment/Building card spaces trigger events.</li>
+                                    <li>Start at Lobby (bottom-left).</li>
+                                    <li>Snake upward across floors to Penthouse floors (top 2 rows).</li>
+                                    <li>End at top-left Elevator door → drop to Lobby → continue climbing.</li>
+                                    <li>Passing Lobby pays +$1,000.</li>
+                                    <li>Apartments are doors; higher floors are more elegant + more expensive.</li>
                                 </ul>
                             </div>
                         </div>
@@ -468,7 +452,7 @@
                     <div class="row">
                         <button id="btnRoll" class="good">Roll</button>
                         <button id="btnBuy">Buy</button>
-                        <button id="btnUpgrade">Upgrade Bed</button>
+                        <button id="btnUpgrade">Buy Bed</button>
                         <button id="btnEnd" class="secondary">End Turn</button>
                         <button id="btnForfeit" class="danger">Forfeit</button>
                     </div>
@@ -495,12 +479,11 @@
             </div>
         </section>
 
-        <!-- PROPERTIES TAB -->
         <section class="card tabPanel" id="tab-properties" style="margin-top:12px;">
             <div class="hd">
                 <div class="title">Properties</div>
                 <div class="row">
-                    <span class="pill">Unowned Market + Your Owned</span>
+                    <span class="pill">Market (unowned) + Current Player Owned</span>
                 </div>
             </div>
             <div class="bd">
@@ -514,7 +497,6 @@
             </div>
         </section>
 
-        <!-- LOG TAB -->
         <section class="card tabPanel" id="tab-log" style="margin-top:12px;">
             <div class="hd">
                 <div class="title">Log</div>
@@ -530,32 +512,46 @@
 
     <script>
         (() => {
-            // ---------- Crash banner ----------
             function showFatal(msg) {
                 const box = document.createElement("div");
-                box.style.cssText = "position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#5b1b28;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:10px;font:12px system-ui;";
+                box.style.cssText =
+                    "position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;" +
+                    "background:#5b1b28;color:#fff;border:1px solid rgba(255,255,255,.25);" +
+                    "border-radius:12px;padding:10px;font:12px system-ui;";
                 box.textContent = "Apartment Tycoon error: " + msg;
                 document.body.appendChild(box);
             }
             window.addEventListener("error", (e) => showFatal(e.message));
             window.addEventListener("unhandledrejection", (e) => showFatal(e.reason?.message || String(e.reason)));
 
-            // ---------- Constants ----------
-            const TRACK_SIZE = 60;
-            const BED_NAMES = ["Bare", "Twin", "Full", "Queen", "King", "Luxury"];
+            // Board: 60 spaces = 10 rows x 6 cols (snake)
+            const ROWS = 10;
+            const COLS = 6;
+            const TRACK_SIZE = ROWS * COLS;
+
+            const LOBBY_INDEX = 0;            // bottom-left
+            const ELEVATOR_INDEX = TRACK_SIZE - 1; // top-left (end)
+
+            const PASS_LOBBY_BONUS = 1000;
+
+            const BED_MAX = 4;
+            const BED_NAMES = ["Unfurnished", "Single", "Bunk", "Double", "King"];
 
             const SPACE = {
-                START: "START",
+                LOBBY: "LOBBY",
                 APARTMENT: "APARTMENT",
-                TAX: "TAX",
+                POOL: "POOL",
+                POOLHALL: "POOLHALL",
+                LAUNDRY: "LAUNDRY",
+                SPEAKEASY: "SPEAKEASY",
                 CARD_APT: "CARD_APT",
                 CARD_BLD: "CARD_BLD",
-                TRANSIT: "TRANSIT",
-                FREE: "FREE",
+                TAX: "TAX",
+                ELEVATOR: "ELEVATOR",
             };
 
-            // ---------- Helpers ----------
             const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
             function shuffle(arr) {
                 for (let i = arr.length - 1; i > 0; i--) {
@@ -565,85 +561,103 @@
                 return arr;
             }
 
-            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-            // Distinct colors (unique per set)
+            // Make lots of distinct colors; used per set and never shared.
             function generateDistinctColors(n) {
                 const out = [];
                 for (let i = 0; i < n; i++) {
                     const hue = Math.round((i * 360) / n);
-                    const sat = 85;
-                    const light = 55;
-                    out.push(`hsl(${hue} ${sat}% ${light}%)`);
+                    out.push(`hsl(${hue} 85% 55%)`);
                 }
                 return out;
             }
 
-            // ---------- Cards ----------
+            // Cards (we’ll expand to your full 30/30 next)
             const apartmentCards = [
-                { title: "Tenant Boom", text: "Renters flood the market. Collect $100.", effect: (g, p) => cash(p, +100) },
-                { title: "Late Rent", text: "You cover a shortfall. Pay $60.", effect: (g, p) => cash(p, -60) },
-                { title: "Great Reviews", text: "Your next rent collected is doubled.", effect: (g, p) => { p.status.doubleNextRent = true; } },
+                { title: "Rent Rebate", text: "Receive $1,000 from bank.", effect: (g, p) => cash(p, +1000) },
+                { title: "Newsletter Chairman", text: "Collect $200 from bank.", effect: (g, p) => cash(p, +200) },
+                { title: "Talent Show Win", text: "Receive $700 from bank.", effect: (g, p) => cash(p, +700) },
                 {
-                    title: "Noise Complaint", text: "Pay $40 per bed level across your properties (max $200).", effect: (g, p) => {
-                        const sumBeds = p.owned.reduce((a, id) => a + g.spaces[id].beds, 0);
-                        cash(p, -Math.min(200, sumBeds * 40));
+                    title: "Resident Appreciation Day", text: "Each player collects $500 from bank.", effect: (g, p) => {
+                        g.players.filter(x => !x.bankrupt).forEach(x => cash(x, +500));
                     }
                 },
-                { title: "City Festival", text: "Advance 3 spaces.", effect: (g, p) => moveBy(g, p, 3, true) },
-                { title: "Lease Renewal", text: "Collect $25 per apartment you own.", effect: (g, p) => cash(p, p.owned.length * 25) },
                 {
-                    title: "Broken Heater", text: "Downgrade one random owned apartment by 1 bed (min 0).", effect: (g, p) => {
-                        if (!p.owned.length) return;
-                        const id = p.owned[randInt(0, p.owned.length - 1)];
-                        g.spaces[id].beds = Math.max(0, g.spaces[id].beds - 1);
-                        log(`🛠️ ${p.name} repair hit: ${g.spaces[id].name} now ${BED_NAMES[g.spaces[id].beds]}.`, "warnTxt");
+                    title: "Building Holiday", text: "Each player receives $1,550 from bank.", effect: (g, p) => {
+                        g.players.filter(x => !x.bankrupt).forEach(x => cash(x, +1550));
                     }
                 },
-                { title: "Security Deposit", text: "Collect $80.", effect: (g, p) => cash(p, +80) },
+                {
+                    title: "Go to Lobby", text: "Go to Lobby and collect $900.", effect: (g, p) => {
+                        p.pos = LOBBY_INDEX;
+                        cash(p, +900);
+                        log(`🏢 ${p.name} goes to the Lobby.`, "warnTxt");
+                    }
+                },
+                {
+                    title: "Supervisor Hired (KEEP)", text: "Keep this card. +$700 now. When repairs happen, collect $1,000.", effect: (g, p) => {
+                        if (!p.status.supervisor) {
+                            p.status.supervisor = true;
+                            log(`🧰 ${p.name} is now the Supervisor (keep).`, "goodTxt");
+                        }
+                        cash(p, +700);
+                    }
+                },
             ];
 
             const buildingCards = [
+                { title: "Renter’s Insurance Due", text: "Pay $500 for each apartment owned.", effect: (g, p) => cash(p, -500 * p.owned.length) },
+                { title: "Faulty Wiring", text: "Pay $1,000 fine.", effect: (g, p) => cash(p, -1000) },
+                { title: "No Smoke Alarms", text: "Pay $800 for each apartment owned.", effect: (g, p) => cash(p, -800 * p.owned.length) },
                 {
-                    title: "Renovation Grant", text: "Upgrade one apartment for free (+1 bed).", effect: (g, p) => {
-                        const upgradable = p.owned.filter(id => g.spaces[id].beds < 5);
-                        if (!upgradable.length) return;
-                        const id = upgradable[randInt(0, upgradable.length - 1)];
-                        g.spaces[id].beds += 1;
-                        log(`🏗️ Grant upgraded ${g.spaces[id].name} to ${BED_NAMES[g.spaces[id].beds]}.`, "goodTxt");
+                    title: "Overcrowded", text: "Pay $200 for each bed owned.", effect: (g, p) => {
+                        const beds = p.owned.reduce((a, id) => a + (g.spaces[id].beds || 0), 0);
+                        cash(p, -200 * beds);
                     }
                 },
-                { title: "Property Tax Hike", text: "Pay 10% of your cash (min $50).", effect: (g, p) => cash(p, -Math.max(50, Math.floor(p.cash * 0.10))) },
-                { title: "Appliance Package", text: "Next upgrade costs 50% less.", effect: (g, p) => { p.status.halfNextUpgrade = true; } },
-                { title: "Inspection Pass", text: "Collect $70.", effect: (g, p) => cash(p, +70) },
-                { title: "Elevator Failure", text: "Pay $80, then move back 2 spaces.", effect: (g, p) => { cash(p, -80); moveBy(g, p, -2, true); } },
-                { title: "Investor Interest", text: "Next unowned apartment you land on is 20% off.", effect: (g, p) => { p.status.discountNextBuy = true; } },
-                { title: "Contractor Overcharge", text: "Pay $120.", effect: (g, p) => cash(p, -120) },
-                { title: "Community Partnerships", text: "Collect $40 per complete set you own.", effect: (g, p) => cash(p, countCompleteSets(g, p) * 40) },
+                { title: "Evict Tenant", text: "Pay $1,250 cost.", effect: (g, p) => cash(p, -1250) },
+                {
+                    title: "New Hot Water Heater", text: "Pay $3,500, plus a Supervisor fee.", effect: (g, p) => {
+                        cash(p, -3500);
+                        paySupervisorFee(g, p);
+                    }
+                },
+                {
+                    title: "Pipes Broke", text: "Pay $3,500, plus a Supervisor fee.", effect: (g, p) => {
+                        cash(p, -3500);
+                        paySupervisorFee(g, p);
+                    }
+                },
+                {
+                    title: "Toilet Clogged", text: "Pay Supervisor fee, or if no Supervisor exists pay bank $1,000.", effect: (g, p) => {
+                        const ok = paySupervisorFee(g, p, /*fallbackBank=*/1000);
+                        if (ok === false) cash(p, -1000);
+                    }
+                },
             ];
 
-            // ---------- Game State ----------
             let game = null;
 
             function currentPlayer(g) { return g.players[g.turn]; }
             function alivePlayers(g) { return g.players.filter(p => !p.bankrupt); }
 
-            function newGameState(numPlayers = 2, startCash = 1500) {
-                const spaces = buildBoard();
+            function newGameState(numPlayers = 2, startCash = 4500) {
+                const spaces = buildSnakeBoard();
+
                 const tokenColors = ["#7aa0ff", "#ff7aa0", "#7affc6", "#ffd07a"];
                 const players = Array.from({ length: numPlayers }, (_, i) => ({
                     id: i,
                     name: `Player ${i + 1}`,
                     token: tokenColors[i],
-                    pos: 0,
+                    pos: LOBBY_INDEX,
                     cash: startCash,
                     owned: [],
-                    status: { doubleNextRent: false, halfNextUpgrade: false, discountNextBuy: false },
+                    status: { supervisor: false },
                     bankrupt: false,
                 }));
+
                 return {
                     turn: 0,
-                    phase: "NEED_ROLL", // NEED_ROLL, RESOLVED
+                    phase: "NEED_ROLL",
                     lastRoll: null,
                     spaces,
                     players,
@@ -655,86 +669,139 @@
                 };
             }
 
-            // ---------- Board Construction (UNIQUE COLOR SETS, sizes 2–3, no sharing) ----------
-            function buildBoard() {
+            // Convert track index to row/col in a snake:
+            // i=0 is bottom-left. Row 0 goes left->right. Row 1 goes right->left. Ends at top-left.
+            function indexToRC(i) {
+                const r = Math.floor(i / COLS); // 0..ROWS-1 (bottom floor to top floor)
+                const c = i % COLS;
+                const isOddRow = (r % 2) === 1;
+                const col = isOddRow ? (COLS - 1 - c) : c;
+                return { r, c: col };
+            }
+
+            function floorName(r) {
+                // r=0 is floor 1 (lobby floor). r=8/9 are penthouse floors.
+                const floorNum = r + 1;
+                if (r >= ROWS - 2) return `Penthouse Floor ${floorNum}`;
+                return `Floor ${floorNum}`;
+            }
+
+            // Build snake board with doors, penthouse pricing, multiple card spots
+            function buildSnakeBoard() {
                 const spaces = new Array(TRACK_SIZE).fill(null);
+                const specials = new Map();
 
-                // Specials: 18 fixed spaces
-                const specials = new Map([
-                    [0, { type: SPACE.START, name: "Move-In Day (Start)", text: "Collect $200 when you pass." }],
-                    [5, { type: SPACE.CARD_APT, name: "Apartment Card", text: "Draw an Apartment Card." }],
-                    [10, { type: SPACE.TAX, name: "City Tax", text: "Pay $150." }],
-                    [12, { type: SPACE.CARD_BLD, name: "Building Card", text: "Draw a Building Card." }],
-                    [15, { type: SPACE.TRANSIT, name: "Subway Station", text: "Jump ahead to nearest Card space." }],
-                    [20, { type: SPACE.FREE, name: "Community Park", text: "Nothing happens." }],
-                    [22, { type: SPACE.CARD_APT, name: "Apartment Card", text: "Draw an Apartment Card." }],
-                    [25, { type: SPACE.TAX, name: "Maintenance Fee", text: "Pay $100." }],
-                    [27, { type: SPACE.CARD_BLD, name: "Building Card", text: "Draw a Building Card." }],
-                    [30, { type: SPACE.TRANSIT, name: "Moving Truck", text: "Go to Start, collect $200." }],
-                    [35, { type: SPACE.CARD_APT, name: "Apartment Card", text: "Draw an Apartment Card." }],
-                    [40, { type: SPACE.TAX, name: "Insurance Premium", text: "Pay $120." }],
-                    [42, { type: SPACE.CARD_BLD, name: "Building Card", text: "Draw a Building Card." }],
-                    [45, { type: SPACE.TRANSIT, name: "Real Estate Expo", text: "Move forward 5 spaces." }],
-                    [50, { type: SPACE.FREE, name: "Coffee Shop", text: "Nothing happens." }],
-                    [52, { type: SPACE.CARD_APT, name: "Apartment Card", text: "Draw an Apartment Card." }],
-                    [55, { type: SPACE.TAX, name: "Utility Bill", text: "Pay $90." }],
-                    [57, { type: SPACE.CARD_BLD, name: "Building Card", text: "Draw a Building Card." }],
-                ]);
+                // Lobby
+                specials.set(LOBBY_INDEX, { type: SPACE.LOBBY, name: "Lobby", text: `Start here. Passing Lobby: +$${PASS_LOBBY_BONUS}.` });
 
-                const apartmentsNeeded = TRACK_SIZE - specials.size; // 42
+                // Elevator door is the last space at top-left
+                specials.set(ELEVATOR_INDEX, { type: SPACE.ELEVATOR, name: "Elevator Door", text: "Enter Elevator: drop to Lobby and continue next turns." });
 
-                // Choose set sizes 2 or 3 that sum to 42.
-                // Clean default: 14 sets of 3 (all sets size 3).
-                // If you want a mix, replace with any pattern of 2/3 that totals 42.
-                const SET_SIZES = Array(14).fill(3);
+                // Speakeasy is in penthouse region (top two floors): choose index 56 (row 9 area)
+                specials.set(56, { type: SPACE.SPEAKEASY, name: "Humstring’s Speakeasy", text: "Gamble: roll d12. 6+ win, 5- lose. Amount = roll × 20." });
 
-                const setCount = SET_SIZES.length;
+                // Fixed-rent spots (you can move these later)
+                specials.set(18, { type: SPACE.POOL, name: "Swimming Pool", text: "Fixed rent: $300." });
+                specials.set(33, { type: SPACE.POOLHALL, name: "Pool Hall", text: "Fixed rent: $500." });
+
+                // Laundry Mats (not deeded)
+                specials.set(27, { type: SPACE.LAUNDRY, name: "Laundry Mat", text: "Not deeded. Pay asking fee: $250." });
+                specials.set(43, { type: SPACE.LAUNDRY, name: "Laundry Mat", text: "Not deeded. Pay asking fee: $250." });
+
+                // Multiple Apartment/Building card spots
+                [6, 21, 32, 47].forEach(i => specials.set(i, { type: SPACE.CARD_APT, name: "Apartment Card", text: "Draw an Apartment Card (good)." }));
+                [12, 25, 40, 52].forEach(i => specials.set(i, { type: SPACE.CARD_BLD, name: "Building Card", text: "Draw a Building Card (bad)." }));
+
+                // Some fee spaces (placeholders)
+                specials.set(9, { type: SPACE.TAX, name: "Code Violation", text: "Pay $800.", amount: 800 });
+                specials.set(29, { type: SPACE.TAX, name: "Inspection Fee", text: "Pay $1,000.", amount: 1000 });
+
+                const apartmentsNeeded = TRACK_SIZE - specials.size;
+
+                // Create 2-3 sized sets that sum exactly, each set gets unique color (never shared)
+                const setSizes = [];
+                let remaining = apartmentsNeeded;
+                while (remaining > 0) {
+                    // prefer 3s, but keep solvable
+                    const size = (remaining % 3 === 0) ? 3 : (remaining % 2 === 0 ? 2 : 3);
+                    setSizes.push(size);
+                    remaining -= size;
+                }
+
+                const setCount = setSizes.length;
                 const setColors = generateDistinctColors(setCount);
 
+                let aptCode = 101;
+                let setNum = 1;
                 const apartments = [];
-                for (let setNum = 0; setNum < setCount; setNum++) {
-                    const size = SET_SIZES[setNum];
-                    const color = setColors[setNum];
-                    const tier = setNum + 1; // 1..setCount
+
+                for (let si = 0; si < setCount; si++) {
+                    const size = setSizes[si];
+                    const color = setColors[si];
 
                     for (let u = 0; u < size; u++) {
                         apartments.push({
                             type: SPACE.APARTMENT,
                             id: null,
-                            setKey: `set-${setNum + 1}`,         // unique set id (NO sharing)
-                            setName: `Set ${setNum + 1}`,
-                            colorHex: color,                   // unique color per set
-                            name: `Set ${setNum + 1} – Unit ${u + 1}`,
-                            price: 110 + tier * 18 + u * 12,
-                            baseRent: 18 + tier * 4 + u * 3,
-                            upgradeCost: 80 + tier * 16,
+                            aptCode: aptCode++,
+                            setKey: `set-${setNum}`,
+                            setName: `Set ${setNum}`,
+                            colorHex: color,
+                            name: `Apt ${aptCode - 1}`,
                             owner: null,
                             beds: 0,
-                            text: "Buy it or pay rent if owned."
+                            // price/rent computed later using floor elegance
+                            price: 0,
+                            baseRent: 0,
+                            bedCost: 0,
+                            text: "Door apartment. Buy it or pay rent if owned. Beds max 4."
                         });
                     }
+                    setNum++;
                 }
 
                 if (apartments.length !== apartmentsNeeded) {
                     throw new Error(`Apartment count mismatch: made ${apartments.length}, need ${apartmentsNeeded}`);
                 }
 
-                // Fill spaces
+                // Place into track; compute elegance/pricing based on row (higher row => more elegant)
                 let ai = 0;
                 for (let i = 0; i < TRACK_SIZE; i++) {
                     if (specials.has(i)) {
-                        spaces[i] = { id: i, ...specials.get(i) };
+                        spaces[i] = { id: i, ...specials.get(i), owner: (specials.get(i).owner ?? null) };
                     } else {
                         const apt = apartments[ai++];
-                        if (!apt) throw new Error(`No apartment left to place at index ${i}.`);
+                        const { r } = indexToRC(i);
+                        const floor = r + 1;
+
+                        // Elegance scale: 1..10
+                        let elegance = floor;
+                        // Penthouse boost
+                        const isPenthouse = (r >= ROWS - 2);
+                        if (isPenthouse) elegance += 3;
+
+                        // Pricing model (placeholder): higher floors cost more
+                        apt.price = 200 + elegance * 110 + (uRand(i) * 25);
+                        apt.baseRent = 80 + elegance * 22 + (uRand(i) * 5);
+                        apt.bedCost = 100 + elegance * 18;
+
+                        apt.isPenthouse = isPenthouse;
+                        apt.elegance = elegance;
+
                         apt.id = i;
                         spaces[i] = apt;
                     }
                 }
+
                 return spaces;
             }
 
-            // ---------- Economy ----------
+            // stable-ish tiny variation per index
+            function uRand(i) {
+                const x = Math.sin(i * 999) * 10000;
+                return Math.floor((x - Math.floor(x)) * 6); // 0..5
+            }
+
             function cash(p, amount) {
                 p.cash += amount;
                 if (amount >= 0) log(`💵 ${p.name} +$${amount}. (Cash: $${p.cash})`, "goodTxt");
@@ -747,68 +814,53 @@
                 log(`➡️ $${amount} moved from ${from.name} to ${to.name}.`, "warnTxt");
             }
 
+            function paySupervisorFee(g, payer, fallbackBank = 0) {
+                const sup = g.players.find(pl => !pl.bankrupt && pl.status.supervisor);
+                if (sup) {
+                    const fee = 1000;
+                    transferCash(payer, sup, fee);
+                    log(`🧰 Supervisor fee paid to ${sup.name}: $${fee}.`, "warnTxt");
+                    return true;
+                }
+                if (fallbackBank > 0) {
+                    log(`🧾 No Supervisor exists. Bank fee applies: $${fallbackBank}.`, "warnTxt");
+                    return false;
+                }
+                log(`🧾 No Supervisor exists.`, "warnTxt");
+                return false;
+            }
+
             function ownsCompleteSet(g, p, setKey) {
-                const ids = g.spaces
-                    .filter(s => s.type === SPACE.APARTMENT && s.setKey === setKey)
-                    .map(s => s.id);
+                const ids = g.spaces.filter(s => s.type === SPACE.APARTMENT && s.setKey === setKey).map(s => s.id);
                 return ids.length > 0 && ids.every(id => g.spaces[id].owner === p.id);
             }
 
             function countCompleteSets(g, p) {
-                const setKeys = [...new Set(
-                    g.spaces.filter(s => s.type === SPACE.APARTMENT).map(s => s.setKey)
-                )];
-                let count = 0;
-                for (const key of setKeys) {
-                    if (ownsCompleteSet(g, p, key)) count++;
-                }
-                return count;
+                const keys = [...new Set(g.spaces.filter(s => s.type === SPACE.APARTMENT).map(s => s.setKey))];
+                let c = 0;
+                for (const k of keys) if (ownsCompleteSet(g, p, k)) c++;
+                return c;
             }
 
             function rentFor(space, g) {
-                const bedMult = [1, 1.6, 2.4, 3.5, 5.0, 7.0];
-                let rent = Math.round(space.baseRent * bedMult[space.beds]);
+                // Placeholder ladder: will replace with your exact deed ladders per Apt#
+                const mult = [1.0, 1.55, 2.0, 2.6, 3.4];
+                let rent = Math.round(space.baseRent * mult[space.beds]);
+
+                // Complete set bonus (small)
                 const owner = g.players[space.owner];
                 if (owner && ownsCompleteSet(g, owner, space.setKey)) {
                     rent = Math.round(rent * 1.25);
                 }
+
+                // Penthouse premium
+                if (space.isPenthouse) rent = Math.round(rent * 1.2);
+
                 return rent;
             }
 
-            function upgradePrice(space, player) {
-                let cost = space.upgradeCost;
-                if (player.status.halfNextUpgrade) cost = Math.ceil(cost * 0.5);
-                return cost;
-            }
-
-            function buyPrice(space, player) {
-                let cost = space.price;
-                if (player.status.discountNextBuy) cost = Math.ceil(cost * 0.8);
-                return cost;
-            }
-
-            function taxAmount(space) {
-                if (space.name.includes("City")) return 150;
-                if (space.name.includes("Maintenance")) return 100;
-                if (space.name.includes("Insurance")) return 120;
-                if (space.name.includes("Utility")) return 90;
-                return 100;
-            }
-
-            // ---------- Movement / Resolution ----------
-            function moveBy(g, p, delta, resolveNow = false) {
-                const old = p.pos;
-                let next = (p.pos + delta) % TRACK_SIZE;
-                if (next < 0) next += TRACK_SIZE;
-
-                // passing start only when moving forward across index 0
-                if (delta > 0 && (old + delta) >= TRACK_SIZE) {
-                    cash(p, +200);
-                    log(`🏁 ${p.name} passed Start and collected $200.`, "goodTxt");
-                }
-
-                p.pos = next;
-                if (resolveNow) resolveSpace(g);
+            function bedBuyCost(space) {
+                return space.bedCost ?? 150;
             }
 
             function drawCard(g, which) {
@@ -820,6 +872,27 @@
                 return g.decks[which].shift();
             }
 
+            function moveBy(g, p, delta) {
+                let next = p.pos + delta;
+
+                while (next >= TRACK_SIZE) {
+                    next -= TRACK_SIZE;
+                    cash(p, +PASS_LOBBY_BONUS);
+                    log(`🏢 ${p.name} passed the Lobby (+$${PASS_LOBBY_BONUS}).`, "goodTxt");
+                }
+                while (next < 0) next += TRACK_SIZE;
+
+                p.pos = next;
+
+                // If you land on elevator door (top-left), you drop to Lobby.
+                if (p.pos === ELEVATOR_INDEX) {
+                    log(`🛗 ${p.name} entered the Elevator and drops to the Lobby.`, "warnTxt");
+                    p.pos = LOBBY_INDEX;
+                }
+
+                renderSpaceInfo(g.spaces[p.pos], g);
+            }
+
             function resolveSpace(g) {
                 const p = currentPlayer(g);
                 if (p.bankrupt) return;
@@ -827,75 +900,84 @@
                 const s = g.spaces[p.pos];
                 renderSpaceInfo(s, g);
 
-                if (s.type === SPACE.START) {
-                    log(`🏠 ${p.name} landed on Start.`, "warnTxt");
-                }
+                switch (s.type) {
+                    case SPACE.LOBBY:
+                        log(`🏢 ${p.name} is in the Lobby.`, "warnTxt");
+                        break;
 
-                if (s.type === SPACE.TAX) {
-                    const amount = taxAmount(s);
-                    log(`🏛️ ${p.name} landed on ${s.name}.`, "warnTxt");
-                    cash(p, -amount);
-                }
+                    case SPACE.ELEVATOR:
+                        p.pos = LOBBY_INDEX;
+                        log(`🛗 ${p.name} drops to Lobby.`, "warnTxt");
+                        break;
 
-                if (s.type === SPACE.FREE) {
-                    log(`☕ ${p.name} landed on ${s.name}. Nothing happens.`, "warnTxt");
-                }
+                    case SPACE.TAX:
+                        log(`🏛️ ${p.name} landed on ${s.name}.`, "warnTxt");
+                        cash(p, -(s.amount ?? 500));
+                        break;
 
-                if (s.type === SPACE.TRANSIT) {
-                    log(`🚇 ${p.name} hit ${s.name}.`, "warnTxt");
-                    if (p.pos === 15) {
-                        const cardSpaces = [5, 12, 22, 27, 35, 42, 52, 57];
-                        let best = null;
-                        for (const idx of cardSpaces) {
-                            const dist = (idx - p.pos + TRACK_SIZE) % TRACK_SIZE;
-                            if (dist === 0) continue;
-                            if (best === null || dist < best.dist) best = { idx, dist };
+                    case SPACE.CARD_APT: {
+                        const card = drawCard(g, "apt");
+                        log(`📦 Apartment Card: ${card.title} — ${card.text}`, "warnTxt");
+                        card.effect(g, p);
+                        break;
+                    }
+
+                    case SPACE.CARD_BLD: {
+                        const card = drawCard(g, "bld");
+                        log(`🏗️ Building Card: ${card.title} — ${card.text}`, "warnTxt");
+                        card.effect(g, p);
+                        break;
+                    }
+
+                    case SPACE.LAUNDRY: {
+                        const fee = 250;
+                        log(`🧺 ${p.name} landed on ${s.name}. Pay asking fee $${fee}.`, "warnTxt");
+                        cash(p, -fee);
+                        break;
+                    }
+
+                    case SPACE.SPEAKEASY: {
+                        const r = randInt(1, 12);
+                        const amount = r * 20;
+                        if (r >= 6) {
+                            log(`🥃 Speakeasy roll d12=${r}. You WIN $${amount}.`, "goodTxt");
+                            cash(p, +amount);
+                        } else {
+                            log(`🥃 Speakeasy roll d12=${r}. You LOSE $${amount}.`, "badTxt");
+                            cash(p, -amount);
                         }
-                        moveBy(g, p, best.dist, true);
-                        return;
+                        break;
                     }
-                    if (p.pos === 30) {
-                        p.pos = 0;
-                        cash(p, +200);
-                        log(`🚚 ${p.name} moved to Start and collected $200.`, "goodTxt");
-                    }
-                    if (p.pos === 45) {
-                        moveBy(g, p, 5, true);
-                        return;
-                    }
-                }
 
-                if (s.type === SPACE.CARD_APT) {
-                    const card = drawCard(g, "apt");
-                    log(`📦 Apartment Card: ${card.title} — ${card.text}`, "warnTxt");
-                    card.effect(g, p);
-                }
+                    case SPACE.POOL:
+                    case SPACE.POOLHALL: {
+                        const fixed = (s.type === SPACE.POOL) ? 300 : 500;
+                        const price = s.price ?? ((s.type === SPACE.POOL) ? 1500 : 2000);
 
-                if (s.type === SPACE.CARD_BLD) {
-                    const card = drawCard(g, "bld");
-                    log(`🏗️ Building Card: ${card.title} — ${card.text}`, "warnTxt");
-                    card.effect(g, p);
-                }
-
-                if (s.type === SPACE.APARTMENT) {
-                    if (s.owner === null) {
-                        log(`🏢 ${p.name} landed on unowned ${s.name}. Price $${s.price}.`, "warnTxt");
-                    } else if (s.owner === p.id) {
-                        log(`🔑 ${p.name} landed on their own ${s.name}.`, "goodTxt");
-                    } else {
-                        const owner = g.players[s.owner];
-                        const baseRent = rentFor(s, g);
-                        let pay = baseRent;
-
-                        log(`🧾 ${p.name} owes rent $${baseRent} to ${owner.name} for ${s.name} (${BED_NAMES[s.beds]}).`, "badTxt");
-
-                        if (owner.status.doubleNextRent) {
-                            pay = baseRent * 2;
-                            owner.status.doubleNextRent = false;
-                            log(`✨ ${owner.name}'s "double next rent" triggered! Rent doubled to $${pay}.`, "warnTxt");
+                        if (s.owner == null) {
+                            log(`🎟️ ${p.name} landed on unowned ${s.name}. You may Buy ($${price}).`, "warnTxt");
+                        } else if (s.owner === p.id) {
+                            log(`🔑 ${p.name} landed on their own ${s.name}.`, "goodTxt");
+                        } else {
+                            const owner = g.players[s.owner];
+                            log(`🧾 ${p.name} owes $${fixed} to ${owner.name} for ${s.name}.`, "badTxt");
+                            transferCash(p, owner, fixed);
                         }
+                        break;
+                    }
 
-                        transferCash(p, owner, pay);
+                    case SPACE.APARTMENT: {
+                        if (s.owner === null) {
+                            log(`🚪 ${p.name} is at ${s.name}. Price $${s.price}.`, "warnTxt");
+                        } else if (s.owner === p.id) {
+                            log(`🔑 ${p.name} is at their own ${s.name}.`, "goodTxt");
+                        } else {
+                            const owner = g.players[s.owner];
+                            const rent = rentFor(s, g);
+                            log(`🧾 ${p.name} owes rent $${rent} to ${owner.name} for ${s.name} (${BED_NAMES[s.beds]}).`, "badTxt");
+                            transferCash(p, owner, rent);
+                        }
+                        break;
                     }
                 }
 
@@ -909,14 +991,14 @@
                 for (const p of g.players) {
                     if (!p.bankrupt && p.cash < 0) {
                         p.bankrupt = true;
-                        // release properties
                         for (const id of p.owned) {
                             const s = g.spaces[id];
                             s.owner = null;
-                            s.beds = 0;
+                            if (s.type === SPACE.APARTMENT) s.beds = 0;
                         }
                         p.owned = [];
-                        log(`💥 ${p.name} is BANKRUPT. Properties return to the market.`, "badTxt");
+                        p.status.supervisor = false;
+                        log(`💥 ${p.name} is BANKRUPT. Properties return to market.`, "badTxt");
                     }
                 }
             }
@@ -929,33 +1011,16 @@
                 }
             }
 
-            // ---------- Actions ----------
-            function roll() {
-                const g = game;
-                const p = currentPlayer(g);
-                if (g.phase !== "NEED_ROLL") return;
-
-                const d1 = randInt(1, 6);
-                const d2 = randInt(1, 6);
-                const sum = d1 + d2;
-
-                g.lastRoll = { d1, d2, sum };
-                $("diceOut").textContent = `${d1} + ${d2} = ${sum}`;
-                log(`🎲 ${p.name} rolled ${d1} and ${d2} (total ${sum}).`, "warnTxt");
-
-                moveBy(g, p, sum, false);
-                resolveSpace(g);
-            }
-
             function buy() {
                 const g = game;
                 const p = currentPlayer(g);
                 if (g.phase !== "RESOLVED") return;
 
                 const s = g.spaces[p.pos];
-                if (s.type !== SPACE.APARTMENT || s.owner !== null) return;
+                const buyable = (s.type === SPACE.APARTMENT) || (s.type === SPACE.POOL) || (s.type === SPACE.POOLHALL);
+                if (!buyable || s.owner !== null) return;
 
-                const cost = buyPrice(s, p);
+                const cost = s.price ?? ((s.type === SPACE.POOL) ? 1500 : (s.type === SPACE.POOLHALL ? 2000 : 0));
                 if (p.cash < cost) {
                     log(`❌ Not enough cash to buy ${s.name}. Need $${cost}.`, "badTxt");
                     return;
@@ -963,15 +1028,9 @@
 
                 p.cash -= cost;
                 s.owner = p.id;
-                p.owned.push(s.id);
+                if (!p.owned.includes(s.id)) p.owned.push(s.id);
 
                 log(`✅ ${p.name} bought ${s.name} for $${cost}.`, "goodTxt");
-
-                if (p.status.discountNextBuy) {
-                    p.status.discountNextBuy = false;
-                    log(`📉 Buy discount used up.`, "warnTxt");
-                }
-
                 updateUI();
             }
 
@@ -980,36 +1039,26 @@
                 const p = currentPlayer(g);
                 if (g.phase !== "RESOLVED") return;
 
-                // Prefer upgrading the space you're on if owned, otherwise cheapest upgradable
-                let target = g.spaces[p.pos];
-                if (!(target.type === SPACE.APARTMENT && target.owner === p.id && target.beds < 5)) {
-                    const upgradable = p.owned
-                        .map(id => g.spaces[id])
-                        .filter(s => s.beds < 5)
-                        .sort((a, b) => upgradePrice(a, p) - upgradePrice(b, p));
-                    if (!upgradable.length) {
-                        log(`ℹ️ No properties available to upgrade.`, "warnTxt");
-                        return;
-                    }
-                    target = upgradable[0];
+                const s = g.spaces[p.pos];
+                if (!(s.type === SPACE.APARTMENT && s.owner === p.id)) {
+                    log(`ℹ️ You can only buy beds for an apartment you own (land on it).`, "warnTxt");
+                    return;
+                }
+                if (s.beds >= BED_MAX) {
+                    log(`ℹ️ ${s.name} is already maxed (${BED_NAMES[BED_MAX]}).`, "warnTxt");
+                    return;
                 }
 
-                const cost = upgradePrice(target, p);
+                const cost = bedBuyCost(s);
                 if (p.cash < cost) {
-                    log(`❌ Not enough cash to upgrade. Need $${cost}.`, "badTxt");
+                    log(`❌ Not enough cash to buy a bed. Need $${cost}.`, "badTxt");
                     return;
                 }
 
                 p.cash -= cost;
-                target.beds += 1;
+                s.beds += 1;
 
-                log(`🛏️ ${p.name} upgraded ${target.name} to ${BED_NAMES[target.beds]} (Beds ${target.beds}). Cost $${cost}.`, "goodTxt");
-
-                if (p.status.halfNextUpgrade) {
-                    p.status.halfNextUpgrade = false;
-                    log(`🧰 Half-price upgrade used up.`, "warnTxt");
-                }
-
+                log(`🛏️ ${p.name} furnished ${s.name}: now ${BED_NAMES[s.beds]} (Beds ${s.beds}/${BED_MAX}). Cost $${cost}.`, "goodTxt");
                 updateUI();
             }
 
@@ -1043,136 +1092,269 @@
             const canvas = document.getElementById("board");
             const ctx = canvas.getContext("2d");
 
-            function roundRect(x, y, w, h, r) {
+            function drawRoundedRect(x, y, w, h, r) {
                 ctx.beginPath();
-                ctx.moveTo(x + r, y);
-                ctx.arcTo(x + w, y, x + w, y + h, r);
-                ctx.arcTo(x + w, y + h, x, y + h, r);
-                ctx.arcTo(x, y + h, x, y, r);
-                ctx.arcTo(x, y, x + w, y, r);
-                ctx.closePath();
+                ctx.roundRect(x, y, w, h, r);
+            }
+
+            function drawDoor(x, y, w, h, aptNum, elegance, isPenthouse) {
+                // door frame
+                ctx.save();
+                ctx.translate(x, y);
+
+                const frame = Math.max(2, Math.floor(w * 0.04));
+                const innerW = w - frame * 2;
+                const innerH = h - frame * 2;
+
+                // Frame
+                ctx.fillStyle = "rgba(255,255,255,.10)";
+                drawRoundedRect(0, 0, w, h, 10);
+                ctx.fill();
+
+                // Door body
+                ctx.fillStyle = isPenthouse ? "rgba(255,255,255,.13)" : "rgba(0,0,0,.22)";
+                drawRoundedRect(frame, frame, innerW, innerH, 10);
+                ctx.fill();
+
+                // Panels based on elegance
+                ctx.strokeStyle = "rgba(255,255,255,.18)";
+                ctx.lineWidth = 1;
+
+                const panels = clamp(Math.floor(elegance / 3), 1, 4);
+                for (let i = 0; i < panels; i++) {
+                    const py = frame + 10 + i * ((innerH - 20) / panels);
+                    drawRoundedRect(frame + 8, py, innerW - 16, (innerH - 24) / panels, 8);
+                    ctx.stroke();
+                }
+
+                // Penthouse crown/arch
+                if (isPenthouse) {
+                    ctx.strokeStyle = "rgba(255,255,255,.28)";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(w / 2, frame + 6, w * 0.22, Math.PI, 0);
+                    ctx.stroke();
+                } else if (elegance >= 7) {
+                    // small crown line
+                    ctx.strokeStyle = "rgba(255,255,255,.22)";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(frame + 8, frame + 10);
+                    ctx.lineTo(w - frame - 8, frame + 10);
+                    ctx.stroke();
+                }
+
+                // knob
+                ctx.fillStyle = "rgba(255,255,255,.35)";
+                ctx.beginPath();
+                ctx.arc(frame + innerW * 0.78, frame + innerH * 0.55, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // number on door
+                ctx.fillStyle = "rgba(233,236,255,.92)";
+                ctx.font = "12px system-ui";
+                ctx.textAlign = "center";
+                ctx.fillText(String(aptNum), w / 2, frame + 18);
+
+                ctx.restore();
+            }
+
+            function drawElevatorShaft(pad, top, height, width) {
+                // Left-side full elevator shaft visual (not a playable cell; the elevator door is the top-left cell)
+                ctx.save();
+                ctx.fillStyle = "rgba(155,93,229,.10)";
+                drawRoundedRect(pad, top, width, height, 18);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(155,93,229,.35)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Label
+                ctx.fillStyle = "rgba(233,236,255,.85)";
+                ctx.font = "14px system-ui";
+                ctx.textAlign = "center";
+                ctx.fillText("ELEVATOR", pad + width / 2, top + 26);
+
+                // Arrow down
+                ctx.fillStyle = "rgba(233,236,255,.70)";
+                ctx.font = "12px system-ui";
+                ctx.fillText("↓ to Lobby", pad + width / 2, top + 46);
+
+                // Simple guide line
+                ctx.strokeStyle = "rgba(233,236,255,.12)";
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 6; i++) {
+                    const y = top + 80 + i * ((height - 110) / 6);
+                    ctx.beginPath();
+                    ctx.moveTo(pad + 10, y);
+                    ctx.lineTo(pad + width - 10, y);
+                    ctx.stroke();
+                }
+                ctx.restore();
             }
 
             function drawBoard(g) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                const cx = canvas.width / 2;
-                const cy = canvas.height / 2 + 10;
-                const rx = 430;
-                const ry = 250;
+                const pad = 18;
 
-                ctx.save();
-                ctx.strokeStyle = "rgba(255,255,255,.12)";
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.restore();
+                // Elevator shaft takes left space
+                const shaftW = 120;
+                const gap = 10;
 
-                const points = [];
-                for (let i = 0; i < TRACK_SIZE; i++) {
-                    const t = (i / TRACK_SIZE) * Math.PI * 2 - Math.PI / 2;
-                    points.push({
-                        x: cx + rx * Math.cos(t),
-                        y: cy + ry * Math.sin(t)
-                    });
-                }
+                const gridLeft = pad + shaftW + gap;
+                const gridTop = pad + 14;
 
+                const gridW = canvas.width - gridLeft - pad;
+                const gridH = canvas.height - gridTop - pad;
+
+                const cellW = gridW / COLS;
+                const cellH = gridH / ROWS;
+
+                // Title
+                ctx.fillStyle = "rgba(233,236,255,.9)";
+                ctx.font = "16px system-ui";
+                ctx.textAlign = "left";
+                ctx.fillText("Start: bottom-left (Lobby) → End: top-left (Elevator door)", pad, pad + 4);
+
+                // Elevator shaft visual
+                drawElevatorShaft(pad, gridTop, gridH, shaftW);
+
+                // Draw grid
                 for (let i = 0; i < TRACK_SIZE; i++) {
                     const s = g.spaces[i];
-                    const pt = points[i];
+                    const { r, c } = indexToRC(i);
 
-                    const w = 70;
-                    const h = 28;
+                    // bottom row r=0 is drawn at bottom
+                    const x = gridLeft + c * cellW;
+                    const y = gridTop + (ROWS - 1 - r) * cellH;
 
-                    ctx.save();
-                    ctx.translate(pt.x, pt.y);
-
-                    const ang = Math.atan2(pt.y - cy, pt.x - cx);
-                    ctx.rotate(ang);
-
-                    // base
-                    ctx.fillStyle = "rgba(255,255,255,.06)";
+                    // base cell
+                    ctx.fillStyle = "rgba(255,255,255,.05)";
                     ctx.strokeStyle = "rgba(255,255,255,.12)";
                     ctx.lineWidth = 1;
-                    roundRect(-w / 2, -h / 2, w, h, 10);
+
+                    ctx.beginPath();
+                    ctx.roundRect(x + 2, y + 2, cellW - 4, cellH - 4, 12);
                     ctx.fill();
                     ctx.stroke();
 
-                    // stripe
-                    let stripe = "rgba(255,255,255,.10)";
-                    if (s.type === SPACE.APARTMENT) stripe = s.colorHex;
-                    if (s.type === SPACE.START) stripe = "rgba(122,160,255,.9)";
-                    if (s.type === SPACE.TAX) stripe = "rgba(255,91,107,.9)";
-                    if (s.type === SPACE.CARD_APT) stripe = "rgba(255,209,102,.9)";
-                    if (s.type === SPACE.CARD_BLD) stripe = "rgba(69,212,131,.9)";
-                    if (s.type === SPACE.TRANSIT) stripe = "rgba(155,93,229,.9)";
-                    if (s.type === SPACE.FREE) stripe = "rgba(255,255,255,.25)";
+                    // color ring / accent around cell
+                    let accent = "rgba(255,255,255,.18)";
+                    if (s.type === SPACE.APARTMENT) accent = s.colorHex;
+                    if (s.type === SPACE.LOBBY) accent = "rgba(122,160,255,.9)";
+                    if (s.type === SPACE.ELEVATOR) accent = "rgba(155,93,229,.9)";
+                    if (s.type === SPACE.CARD_APT) accent = "rgba(255,209,102,.9)";
+                    if (s.type === SPACE.CARD_BLD) accent = "rgba(69,212,131,.9)";
+                    if (s.type === SPACE.TAX) accent = "rgba(255,91,107,.9)";
+                    if (s.type === SPACE.POOL) accent = "rgba(70,170,255,.9)";
+                    if (s.type === SPACE.POOLHALL) accent = "rgba(255,170,70,.9)";
+                    if (s.type === SPACE.LAUNDRY) accent = "rgba(190,190,190,.8)";
+                    if (s.type === SPACE.SPEAKEASY) accent = "rgba(255,255,255,.30)";
 
-                    ctx.fillStyle = stripe;
-                    roundRect(-w / 2, -h / 2, 8, h, 6);
-                    ctx.fill();
+                    ctx.strokeStyle = accent;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.roundRect(x + 4, y + 4, cellW - 8, cellH - 8, 12);
+                    ctx.stroke();
 
-                    // index
-                    ctx.fillStyle = "rgba(233,236,255,.9)";
-                    ctx.font = "12px system-ui";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(String(i), 0, 0);
+                    // corner index (small)
+                    ctx.fillStyle = "rgba(233,236,255,.75)";
+                    ctx.font = "11px system-ui";
+                    ctx.textAlign = "left";
+                    ctx.fillText(String(i), x + 8, y + 14);
 
-                    // apartment owner dot + beds
+                    // content:
                     if (s.type === SPACE.APARTMENT) {
+                        const doorX = x + 10;
+                        const doorY = y + 18;
+                        const doorW = cellW - 20;
+                        const doorH = cellH - 28;
+                        drawDoor(doorX, doorY, doorW, doorH, s.aptCode, s.elegance, s.isPenthouse);
+
+                        // owner token
                         if (s.owner !== null) {
                             const owner = g.players[s.owner];
                             ctx.beginPath();
                             ctx.fillStyle = owner.token;
-                            ctx.arc(-w / 2 + 18, 0, 5.5, 0, Math.PI * 2);
+                            ctx.arc(x + cellW - 16, y + 16, 6, 0, Math.PI * 2);
                             ctx.fill();
                             ctx.strokeStyle = "rgba(255,255,255,.35)";
                             ctx.stroke();
                         }
 
-                        // beds indicator (compact)
-                        const beds = s.beds;
-                        ctx.fillStyle = "rgba(233,236,255,.9)";
-                        ctx.font = "11px system-ui";
-                        ctx.textAlign = "right";
-                        const bedText = beds === 0 ? "" : ("🛏".repeat(Math.min(3, beds)) + (beds > 3 ? `+${beds - 3}` : ""));
-                        ctx.fillText(bedText, w / 2 - 8, 0);
+                        // beds indicator
+                        if (s.beds > 0) {
+                            ctx.fillStyle = "rgba(233,236,255,.88)";
+                            ctx.font = "12px system-ui";
+                            ctx.textAlign = "right";
+                            ctx.fillText("🛏".repeat(Math.min(4, s.beds)), x + cellW - 10, y + cellH - 10);
+                        }
+
+                    } else {
+                        // label for specials
+                        ctx.fillStyle = "rgba(233,236,255,.90)";
+                        ctx.font = "12px system-ui";
+                        ctx.textAlign = "left";
+
+                        const label =
+                            s.type === SPACE.LOBBY ? "Lobby" :
+                                s.type === SPACE.ELEVATOR ? "Elevator" :
+                                    s.type === SPACE.POOL ? "Swimming Pool" :
+                                        s.type === SPACE.POOLHALL ? "Pool Hall" :
+                                            s.type === SPACE.LAUNDRY ? "Laundry" :
+                                                s.type === SPACE.SPEAKEASY ? "Speakeasy" :
+                                                    s.type === SPACE.CARD_APT ? "Apartment Card" :
+                                                        s.type === SPACE.CARD_BLD ? "Building Card" :
+                                                            s.type === SPACE.TAX ? "Fee" : s.name;
+
+                        ctx.fillText(label, x + 10, y + 34);
+
+                        // simple icon-ish line
+                        ctx.fillStyle = "rgba(233,236,255,.70)";
+                        ctx.font = "12px system-ui";
+                        const extra =
+                            s.type === SPACE.LOBBY ? `+${PASS_LOBBY_BONUS} pass` :
+                                s.type === SPACE.ELEVATOR ? "Drop to lobby" :
+                                    s.type === SPACE.POOL ? "Rent $300" :
+                                        s.type === SPACE.POOLHALL ? "Rent $500" :
+                                            s.type === SPACE.LAUNDRY ? "Fee $250" :
+                                                s.type === SPACE.SPEAKEASY ? "d12×20" :
+                                                    s.type === SPACE.CARD_APT ? "Draw good" :
+                                                        s.type === SPACE.CARD_BLD ? "Draw bad" :
+                                                            s.type === SPACE.TAX ? `Pay $${s.amount || ""}` : "";
+                        if (extra) ctx.fillText(extra, x + 10, y + 52);
+
+                        // owner token for pool/poolhall if owned
+                        if ((s.type === SPACE.POOL || s.type === SPACE.POOLHALL) && s.owner !== null) {
+                            const owner = g.players[s.owner];
+                            ctx.beginPath();
+                            ctx.fillStyle = owner.token;
+                            ctx.arc(x + cellW - 16, y + 16, 6, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.strokeStyle = "rgba(255,255,255,.35)";
+                            ctx.stroke();
+                        }
                     }
 
-                    // highlight current player position
+                    // current player highlight
                     const cp = currentPlayer(g);
                     if (cp && cp.pos === i) {
-                        ctx.strokeStyle = "rgba(255,255,255,.55)";
-                        ctx.lineWidth = 2.5;
-                        roundRect(-w / 2, -h / 2, w, h, 10);
+                        ctx.strokeStyle = "rgba(255,255,255,.65)";
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.roundRect(x + 2, y + 2, cellW - 4, cellH - 4, 12);
                         ctx.stroke();
                     }
 
-                    ctx.restore();
+                    // floor labels on leftmost column of grid
+                    if (c === 0) {
+                        ctx.fillStyle = "rgba(233,236,255,.40)";
+                        ctx.font = "11px system-ui";
+                        ctx.textAlign = "right";
+                        ctx.fillText(floorName(r), x - 8, y + 18);
+                    }
                 }
-
-                // mini player legend
-                let y = 46;
-                ctx.save();
-                ctx.fillStyle = "rgba(233,236,255,.85)";
-                ctx.font = "14px system-ui";
-                ctx.textAlign = "left";
-                ctx.fillText("Players:", 18, 30);
-                for (const p of g.players) {
-                    ctx.beginPath();
-                    ctx.fillStyle = p.token;
-                    ctx.arc(28, y, 7, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "rgba(255,255,255,.35)";
-                    ctx.stroke();
-                    ctx.fillStyle = "rgba(233,236,255,.85)";
-                    ctx.font = "12px system-ui";
-                    ctx.fillText(`${p.name}  $${p.cash}${p.bankrupt ? " (BANKRUPT)" : ""}`, 42, y + 4);
-                    y += 18;
-                }
-                ctx.restore();
             }
 
             function renderPlayers(g) {
@@ -1199,8 +1381,9 @@
                     kv.innerHTML = `
             <span>Cash: <b>$${p.cash}</b></span>
             <span>Pos: <b>${p.pos}</b></span>
-            <span>Apts: <b>${p.owned.length}</b></span>
+            <span>Owned: <b>${p.owned.length}</b></span>
             <span>Sets: <b>${countCompleteSets(g, p)}</b></span>
+            <span>Supervisor: <b>${p.status.supervisor ? "YES" : "no"}</b></span>
           `;
 
                     info.appendChild(nm);
@@ -1209,16 +1392,7 @@
                     left.appendChild(token);
                     left.appendChild(info);
 
-                    const right = document.createElement("div");
-                    right.className = "kv";
-                    right.innerHTML = `
-            <span class="badge">x2 Rent: <b>${p.status.doubleNextRent ? "ON" : "off"}</b></span>
-            <span class="badge">½ Upgrade: <b>${p.status.halfNextUpgrade ? "ON" : "off"}</b></span>
-            <span class="badge">-20% Buy: <b>${p.status.discountNextBuy ? "ON" : "off"}</b></span>
-          `;
-
                     div.appendChild(left);
-                    div.appendChild(right);
                     wrap.appendChild(div);
                 });
             }
@@ -1232,54 +1406,75 @@
 
                 if (space.type === SPACE.APARTMENT) {
                     const owner = space.owner === null ? "Unowned" : g.players[space.owner].name;
-                    const setComplete = (space.owner !== null) ? ownsCompleteSet(g, g.players[space.owner], space.setKey) : false;
+                    const complete = (space.owner !== null) ? ownsCompleteSet(g, g.players[space.owner], space.setKey) : false;
 
                     mini.innerHTML = `
             <div>
-              Type: <b>Apartment</b>
+              Type: <b>Apartment Door</b>
               <span class="badge" style="border-color:${space.colorHex}">${space.setName}</span>
-              ${setComplete ? `<span class="badge" style="border-color:${space.colorHex}">Complete Set</span>` : ``}
+              ${space.isPenthouse ? `<span class="badge" style="border-color:rgba(255,255,255,.35)">Penthouse</span>` : ``}
+              ${complete ? `<span class="badge" style="border-color:${space.colorHex}">Complete Set</span>` : ``}
             </div>
+            <div>Apt #: <b>${space.aptCode}</b> • ${floorName(indexToRC(space.id).r)}</div>
+            <div>Elegance: <b>${space.elegance}</b></div>
             <div>Owner: <b>${owner}</b></div>
-            <div>Price: <b>$${space.price}</b> • Base rent: <b>$${space.baseRent}</b> • Beds: <b>${space.beds}</b> (${BED_NAMES[space.beds]})</div>
-            <div>Upgrade cost: <b>$${space.upgradeCost}</b> • Current rent: <b>${space.owner === null ? "—" : ("$" + rentFor(space, g))}</b></div>
+            <div>Price: <b>$${space.price}</b> • Base rent: <b>$${space.baseRent}</b></div>
+            <div>Beds: <b>${space.beds}/${BED_MAX}</b> (${BED_NAMES[space.beds]}) • Bed cost: <b>$${bedBuyCost(space)}</b></div>
+            <div>Current rent (if owned): <b>${space.owner === null ? "—" : ("$" + rentFor(space, g))}</b></div>
           `;
-                } else {
-                    mini.textContent = space.text || "";
+                    return;
                 }
+
+                if (space.type === SPACE.POOL || space.type === SPACE.POOLHALL) {
+                    const fixed = (space.type === SPACE.POOL) ? 300 : 500;
+                    const owner = space.owner === null ? "Unowned" : g.players[space.owner].name;
+                    const price = space.price ?? ((space.type === SPACE.POOL) ? 1500 : 2000);
+                    mini.innerHTML = `
+            <div>Type: <b>${space.type === SPACE.POOL ? "Swimming Pool" : "Pool Hall"}</b></div>
+            <div>Owner: <b>${owner}</b></div>
+            <div>Buy price: <b>$${price}</b> • Fixed rent: <b>$${fixed}</b></div>
+          `;
+                    return;
+                }
+
+                mini.textContent = space.text || "";
             }
 
             function renderMarket(g) {
                 const el = $("market");
                 el.innerHTML = "";
-                const unowned = g.spaces
-                    .filter(s => s.type === SPACE.APARTMENT && s.owner === null)
-                    .sort((a, b) => a.price - b.price);
+
+                const unowned = g.spaces.filter(s => {
+                    if (s.owner !== null) return false;
+                    return (s.type === SPACE.APARTMENT || s.type === SPACE.POOL || s.type === SPACE.POOLHALL);
+                });
 
                 if (!unowned.length) {
-                    el.innerHTML = `<div class="mini" style="padding:6px 4px;">No unowned apartments left.</div>`;
+                    el.innerHTML = `<div class="mini" style="padding:6px 4px;">No unowned deeded properties left.</div>`;
                     return;
                 }
 
-                for (const s of unowned.slice(0, 40)) {
+                for (const s of unowned.slice(0, 60)) {
                     const div = document.createElement("div");
                     div.className = "listItem";
-                    div.innerHTML = `
-            <div class="big">
-              <span class="badge" style="border-color:${s.colorHex}">${s.setName}</span>
-              ${s.name}
-              <span class="badge">$${s.price}</span>
-            </div>
-            <div class="mini">Base rent $${s.baseRent} • Upgrade $${s.upgradeCost}</div>
-          `;
+                    if (s.type === SPACE.APARTMENT) {
+                        div.innerHTML = `
+              <div class="big">
+                <span class="badge" style="border-color:${s.colorHex}">${s.setName}</span>
+                ${s.name}${s.isPenthouse ? ` <span class="badge">Penthouse</span>` : ""}
+                <span class="badge">$${s.price}</span>
+              </div>
+              <div class="mini">Apt #${s.aptCode} • Base rent $${s.baseRent} • Bed cost $${bedBuyCost(s)}</div>
+            `;
+                    } else {
+                        const price = s.price ?? ((s.type === SPACE.POOL) ? 1500 : 2000);
+                        const fixed = (s.type === SPACE.POOL) ? 300 : 500;
+                        div.innerHTML = `
+              <div class="big">${s.name}<span class="badge">$${price}</span></div>
+              <div class="mini">Fixed rent $${fixed}</div>
+            `;
+                    }
                     el.appendChild(div);
-                }
-                if (unowned.length > 40) {
-                    const more = document.createElement("div");
-                    more.className = "mini";
-                    more.style.padding = "6px 4px 2px";
-                    more.textContent = `…and ${unowned.length - 40} more unowned apartments`;
-                    el.appendChild(more);
                 }
             }
 
@@ -1287,26 +1482,34 @@
                 const el = $("owned");
                 el.innerHTML = "";
                 const p = currentPlayer(g);
-                const owned = p.owned.map(id => g.spaces[id]).sort((a, b) => a.setKey.localeCompare(b.setKey) || a.price - b.price);
 
+                const owned = p.owned.map(id => g.spaces[id]).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
                 if (!owned.length) {
-                    el.innerHTML = `<div class="mini" style="padding:6px 4px;">No properties yet. Buy when you land on an unowned unit.</div>`;
+                    el.innerHTML = `<div class="mini" style="padding:6px 4px;">No properties yet.</div>`;
                     return;
                 }
 
                 for (const s of owned) {
-                    const complete = ownsCompleteSet(g, p, s.setKey);
                     const div = document.createElement("div");
                     div.className = "listItem";
-                    div.innerHTML = `
-            <div class="big">
-              <span class="badge" style="border-color:${s.colorHex}">${s.setName}</span>
-              ${s.name}
-              <span class="badge">Beds ${s.beds} (${BED_NAMES[s.beds]})</span>
-              ${complete ? `<span class="badge" style="border-color:${s.colorHex}">Complete Set</span>` : ``}
-            </div>
-            <div class="mini">Rent now: <b>$${rentFor(s, g)}</b> • Upgrade: <b>$${upgradePrice(s, p)}</b></div>
-          `;
+                    if (s.type === SPACE.APARTMENT) {
+                        const complete = ownsCompleteSet(g, p, s.setKey);
+                        div.innerHTML = `
+              <div class="big">
+                <span class="badge" style="border-color:${s.colorHex}">${s.setName}</span>
+                ${s.name}${s.isPenthouse ? ` <span class="badge">Penthouse</span>` : ""}
+                <span class="badge">Beds ${s.beds}/${BED_MAX}</span>
+                ${complete ? `<span class="badge" style="border-color:${s.colorHex}">Complete</span>` : ``}
+              </div>
+              <div class="mini">Apt #${s.aptCode} • Rent now: <b>$${rentFor(s, g)}</b></div>
+            `;
+                    } else {
+                        const fixed = (s.type === SPACE.POOL) ? 300 : 500;
+                        div.innerHTML = `
+              <div class="big">${s.name} <span class="badge">Fixed rent $${fixed}</span></div>
+              <div class="mini">No beds / fixed rent property.</div>
+            `;
+                    }
                     el.appendChild(div);
                 }
             }
@@ -1319,23 +1522,22 @@
 
                 if (g.phase === "NEED_ROLL") {
                     hTitle.textContent = "Roll";
-                    hText.textContent = "Tap Roll to move.";
+                    hText.textContent = "Tap Roll to move up the building.";
                     return;
                 }
 
-                if (s.type === SPACE.APARTMENT) {
-                    if (s.owner === null) {
-                        hTitle.textContent = "Buy?";
-                        hText.textContent = `You can buy this unit for $${buyPrice(s, p)} (or End Turn).`;
-                    } else if (s.owner === p.id) {
-                        hTitle.textContent = "Upgrade Bed?";
-                        hText.textContent = s.beds < 5
-                            ? `Upgrade this unit for $${upgradePrice(s, p)} (or upgrade your cheapest unit).`
-                            : `This unit is already maxed (Luxury).`;
-                    } else {
-                        hTitle.textContent = "Rent Paid";
-                        hText.textContent = "Rent was handled automatically. End your turn.";
-                    }
+                if (s.owner == null && (s.type === SPACE.APARTMENT || s.type === SPACE.POOL || s.type === SPACE.POOLHALL)) {
+                    hTitle.textContent = "Buy?";
+                    const cost = s.price ?? ((s.type === SPACE.POOL) ? 1500 : 2000);
+                    hText.textContent = `You can buy this for $${cost}, or End Turn.`;
+                    return;
+                }
+
+                if (s.type === SPACE.APARTMENT && s.owner === p.id) {
+                    hTitle.textContent = "Buy Bed?";
+                    hText.textContent = (s.beds < BED_MAX)
+                        ? `Buy a bed upgrade for $${bedBuyCost(s)} (max ${BED_MAX}).`
+                        : `Already maxed at ${BED_NAMES[BED_MAX]}.`;
                     return;
                 }
 
@@ -1366,23 +1568,17 @@
                 renderHint(g);
                 drawBoard(g);
 
-                // Button states
                 $("btnRoll").disabled = (g.phase !== "NEED_ROLL");
                 $("btnEnd").disabled = (g.phase === "NEED_ROLL");
 
                 const s = g.spaces[p.pos];
-                $("btnBuy").disabled = !(g.phase === "RESOLVED" && s.type === SPACE.APARTMENT && s.owner === null);
+                const buyable = (s.owner === null) && (s.type === SPACE.APARTMENT || s.type === SPACE.POOL || s.type === SPACE.POOLHALL);
+                $("btnBuy").disabled = !(g.phase === "RESOLVED" && buyable);
 
-                const canUpgrade =
-                    (g.phase === "RESOLVED") &&
-                    (
-                        (s.type === SPACE.APARTMENT && s.owner === p.id && s.beds < 5) ||
-                        (p.owned.some(id => g.spaces[id].beds < 5))
-                    );
+                const canUpgrade = (g.phase === "RESOLVED" && s.type === SPACE.APARTMENT && s.owner === p.id && s.beds < BED_MAX);
                 $("btnUpgrade").disabled = !canUpgrade;
             }
 
-            // ---------- Log ----------
             function log(msg, cls = "") {
                 const el = $("log");
                 const div = document.createElement("div");
@@ -1393,21 +1589,19 @@
             }
             function clearLog() { $("log").innerHTML = ""; }
 
-            // ---------- DOM helpers ----------
             function $(id) { return document.getElementById(id); }
 
-            // ---------- Tabs ----------
+            // Tabs
             function setTab(tab) {
                 document.querySelectorAll(".tabBtn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
                 document.querySelectorAll(".tabPanel").forEach(p => p.classList.remove("active"));
                 document.getElementById(`tab-${tab}`).classList.add("active");
             }
-
-            // ---------- Wire up ----------
             document.querySelectorAll(".tabBtn").forEach(btn => {
                 btn.addEventListener("click", () => setTab(btn.dataset.tab));
             });
 
+            // Buttons
             $("btnClearLog").addEventListener("click", clearLog);
 
             $("btnNew").addEventListener("click", () => {
@@ -1418,23 +1612,21 @@
                 $("turnDot").style.background = "transparent";
                 $("diceOut").textContent = "–";
                 clearLog();
-                // draw a preview board
-                const preview = newGameState(2, 1500);
+                const preview = newGameState(2, 4500);
                 drawBoard(preview);
                 setTab("actions");
             });
 
             $("btnStart").addEventListener("click", () => {
                 const n = clamp(parseInt($("numPlayers").value, 10), 2, 4);
-                const cash0 = Math.max(500, parseInt($("startCash").value, 10) || 1500);
-
+                const cash0 = Math.max(1000, parseInt($("startCash").value, 10) || 4500);
                 game = newGameState(n, cash0);
 
                 $("setup").style.display = "none";
                 $("gameUI").style.display = "";
 
                 clearLog();
-                log("🎉 Game started! Pass Start to collect $200.", "goodTxt");
+                log(`🎉 Game started! Passing Lobby pays +$${PASS_LOBBY_BONUS}.`, "goodTxt");
                 log(`➡️ ${currentPlayer(game).name} goes first.`, "warnTxt");
 
                 $("diceOut").textContent = "–";
@@ -1442,15 +1634,29 @@
                 setTab("board");
             });
 
-            $("btnRoll").addEventListener("click", roll);
+            $("btnRoll").addEventListener("click", () => {
+                const g = game;
+                if (!g || g.phase !== "NEED_ROLL") return;
+                const p = currentPlayer(g);
+
+                const d1 = randInt(1, 6), d2 = randInt(1, 6);
+                const sum = d1 + d2;
+                g.lastRoll = { d1, d2, sum };
+                $("diceOut").textContent = `${d1} + ${d2} = ${sum}`;
+                log(`🎲 ${p.name} rolled ${d1} and ${d2} (total ${sum}).`, "warnTxt");
+
+                moveBy(g, p, sum);
+                resolveSpace(g);
+            });
+
             $("btnBuy").addEventListener("click", buy);
             $("btnUpgrade").addEventListener("click", upgrade);
             $("btnEnd").addEventListener("click", endTurn);
             $("btnForfeit").addEventListener("click", forfeit);
 
-            // ---------- Initial preview ----------
+            // Initial preview
             try {
-                const preview = newGameState(2, 1500);
+                const preview = newGameState(2, 4500);
                 drawBoard(preview);
             } catch (e) {
                 console.error(e);
