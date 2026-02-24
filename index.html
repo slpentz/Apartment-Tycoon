@@ -334,14 +334,22 @@
  */
 
 const COLORS = [
-  { key:"red", name:"Red", hex:"#ff3b3b" },
-  { key:"yellowOrange", name:"Yellow-Orange", hex:"#ffb703" },
-  { key:"blue", name:"Blue", hex:"#3a86ff" },
-  { key:"green", name:"Green", hex:"#2ecc71" },
-  { key:"violet", name:"Violet", hex:"#9b5de5" },
-  { key:"brown", name:"Brown", hex:"#8d6e63" },
-  { key:"limeGreen", name:"Lime Green", hex:"#b6ff3b" },
-  { key:"redOrange", name:"Red-Orange", hex:"#ff6d00" },
+    // Generate N distinct colors (unique per set)
+    function generateDistinctColors(n) {
+        const out = [];
+        for (let i = 0; i < n; i++) {
+            const hue = Math.round((i * 360) / n);
+            // Slightly vary lightness to keep colors readable but still distinct
+            const sat = 85;
+            const light = 55;
+            out.push({
+                key: `setColor${i + 1}`,
+                name: `Set Color ${i + 1}`,
+                hex: `hsl(${hue} ${sat}% ${light}%)`,
+            });
+        }
+        return out;
+    }
 ];
 
 const BED_NAMES = ["Bare","Twin","Full","Queen","King","Luxury"];
@@ -445,60 +453,51 @@ function newGameState(numPlayers=2, startCash=1500){
 function buildBoard(){
   // 60 spaces: mix of apartments + special spaces
   // We'll create 40 apartments, 20 special.
-  const spaces = new Array(TRACK_SIZE).fill(null);
+    // ===== Apartment generation (unique color per set, set sizes 2 or 3) =====
+    const apartmentsNeeded = TRACK_SIZE - specials.size; // 42
 
-  // Place specials at fixed indices
-  const specials = new Map([
-    [0,  {type:SPACE.START, name:"Move-In Day (Start)", text:"Collect $200 when you pass."}],
-    [5,  {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
-    [10, {type:SPACE.TAX, name:"City Tax", text:"Pay $150."}],
-    [12, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
-    [15, {type:SPACE.TRANSIT, name:"Subway Station", text:"Jump ahead to nearest Card space."}],
-    [20, {type:SPACE.FREE, name:"Community Park", text:"Take a break. Nothing happens."}],
-    [22, {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
-    [25, {type:SPACE.TAX, name:"Maintenance Fee", text:"Pay $100."}],
-    [27, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
-    [30, {type:SPACE.TRANSIT, name:"Moving Truck", text:"Advance to space 0, collect start pass money if applicable."}],
-    [35, {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
-    [40, {type:SPACE.TAX, name:"Insurance Premium", text:"Pay $120."}],
-    [42, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
-    [45, {type:SPACE.TRANSIT, name:"Real Estate Expo", text:"Move forward 5 spaces."}],
-    [50, {type:SPACE.FREE, name:"Coffee Shop", text:"Nothing happens."}],
-    [52, {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
-    [55, {type:SPACE.TAX, name:"Utility Bill", text:"Pay $90."}],
-    [57, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
-  ]);
+    // Choose a pattern of 2s and 3s that sums to 42.
+    // Example: 14 sets of 3 each = 42 (no 2s at all, very clean)
+    const SET_SIZES = Array(14).fill(3); // 14 unique sets, each has 3 apartments
 
-  // Define color sets distribution across apartments
-  // Each set has 5 apartments = 40 total
-  const setSize = 5;
-  const apartments = [];
-  let aptIndex = 1;
+    // If you prefer a mix of 2 and 3, here’s a valid example too:
+    // const SET_SIZES = [3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2]; // 10*3 + 6*2 = 42
 
-  for(const c of COLORS){
-    for(let i=0;i<setSize;i++){
-      // Pricing & rent tiers (later sets slightly pricier)
-      const tier = COLORS.findIndex(x=>x.key===c.key) + 1; // 1..8
-      const price = 90 + tier*25 + i*10; // ~125..?
-      const baseRent = 14 + tier*6 + i*2; // ~22..?
-      const upgradeCost = 50 + tier*30; // ~80..290
+    const setCount = SET_SIZES.length;
+    const SET_COLORS = generateDistinctColors(setCount);
 
-      apartments.push({
-        type:SPACE.APARTMENT,
-        name:`${c.name} Apt ${i+1}`,
-        setKey:c.key,
-        colorHex:c.hex,
-        price,
-        baseRent,
-        upgradeCost,
-        owner:null,
-        beds:0,
-        id:null,
-        text:"Buy it or pay rent if owned.",
-      });
+    const apartments = [];
+    for (let setNum = 0; setNum < setCount; setNum++) {
+        const setSize = SET_SIZES[setNum];
+        const c = SET_COLORS[setNum];
+
+        // Tier scaling by set number (later sets cost more / rent more)
+        const tier = setNum + 1;
+
+        for (let i = 0; i < setSize; i++) {
+            apartments.push({
+                type: SPACE.APARTMENT,
+                name: `Apartment Set ${setNum + 1} – Unit ${i + 1}`,
+                setKey: `set-${setNum + 1}`,     // unique set (no sharing)
+                colorHex: c.hex,               // unique color for this set
+                price: 110 + tier * 18 + i * 12,
+                baseRent: 18 + tier * 4 + i * 3,
+                upgradeCost: 80 + tier * 16,
+                owner: null,
+                beds: 0,
+                id: null,
+                text: "Buy it or pay rent if owned.",
+            });
+        }
+    }
+
+    // Safety check
+    if (apartments.length !== apartmentsNeeded) {
+        throw new Error(`Apartment count mismatch: made ${apartments.length}, need ${apartmentsNeeded}`);
+    }
       aptIndex++;
     }
-  }
+  
 
   // Fill spaces
   let ai = 0;
