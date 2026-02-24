@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Apartment Tycoon (Prototype)</title>
+  <style>
+    :root{
+      --bg:#0f1220;
+      --panel:#171b2e;
+      --panel2:#1e2440;
+      --text:#e9ecff;
+      --muted:#a9b0d9;
+      --good:#45d483;
+      --bad:#ff5b6b;
+      --warn:#ffd166;
+      --line: rgba(255,255,255,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, #1a2150 0%, var(--bg) 50%) fixed;
+      color:var(--text);
+    }
+    header{
+      padding:14px 18px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    header h1{
+      font-size:18px;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    header .sub{
+      font-size:12px;
+      color:var(--muted);
+    }
+    main{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:14px;
+      padding:14px;
+      align-items:start;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card .hd{
+      padding:12px 12px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(0,0,0,.16);
+    }
+    .card .hd .title{
+      font-size:13px;
+      letter-spacing:.2px;
+      color:var(--muted);
+      text-transform:uppercase;
+    }
+    .card .bd{
+      padding:12px;
+    }
+    button{
+      background: #2b3570;
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:10px;
+      padding:9px 12px;
+      font-weight:650;
+      cursor:pointer;
+      transition: transform .06s ease, filter .12s ease;
+    }
+    button:hover{ filter:brightness(1.07); }
+    button:active{ transform: translateY(1px); }
+    button.secondary{ background: rgba(255,255,255,.06); }
+    button.danger{ background:#5b1b28; }
+    button.good{ background:#1d5a3a; }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .muted{ color:var(--muted); }
+    .pill{
+      display:inline-flex;
+      gap:7px;
+      align-items:center;
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; border:1px solid rgba(255,255,255,.35); }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .players{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .playerBox{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.14);
+      border-radius:12px;
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .playerBox.active{
+      outline:2px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 0 2px rgba(123,155,255,.15);
+    }
+    .playerLeft{ display:flex; gap:10px; align-items:center; }
+    .token{
+      width:14px; height:14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.45);
+      box-shadow: 0 0 0 2px rgba(0,0,0,.25) inset;
+    }
+    .playerName{
+      font-weight:750;
+      font-size:13px;
+    }
+    .kv{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .log{
+      height: 240px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(0,0,0,.18);
+      padding:10px;
+      font-size:12px;
+      line-height:1.35;
+    }
+    .log .line{ margin-bottom:8px; }
+    .log .good{ color: var(--good); }
+    .log .bad{ color: var(--bad); }
+    .log .warn{ color: var(--warn); }
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      background: rgba(0,0,0,.18);
+      border-top:1px solid var(--line);
+    }
+    .panelSplit{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .list{
+      max-height: 260px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(0,0,0,.16);
+      padding:8px;
+    }
+    .listItem{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius:10px;
+      padding:8px;
+      margin-bottom:8px;
+    }
+    .listItem:last-child{ margin-bottom:0; }
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .big{
+      font-size:14px;
+      font-weight:800;
+      margin-bottom:3px;
+    }
+    .badge{
+      display:inline-block;
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color:var(--muted);
+    }
+    .hr{ height:1px; background: var(--line); margin:10px 0; }
+    .setupRow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    input[type="number"], input[type="text"]{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.18);
+      color:var(--text);
+      border-radius:10px;
+      padding:8px 10px;
+      outline:none;
+    }
+    label{ font-size:12px; color:var(--muted); }
+    .hint{ font-size:12px; color:var(--muted); line-height:1.35; }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Apartment Tycoon <span class="sub">(prototype)</span></h1>
+    <div class="sub">60 spaces • color sets • Apartment + Building cards • bed upgrades & rent</div>
+  </div>
+  <div class="row">
+    <button class="secondary" id="btnNew">New Game</button>
+    <button class="secondary" id="btnResetLog">Clear Log</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: Controls + Players + Log -->
+  <section class="card">
+    <div class="hd">
+      <div class="title">Control Center</div>
+      <div class="row">
+        <span class="pill"><span class="dot" id="turnDot"></span><span id="turnLabel">Not started</span></span>
+        <span class="pill">Dice: <b id="diceOut">–</b></span>
+      </div>
+    </div>
+    <div class="bd">
+      <div id="setup">
+        <div class="setupRow">
+          <label>Players (2–4):</label>
+          <input type="number" id="numPlayers" min="2" max="4" value="2" />
+          <label>Starting cash:</label>
+          <input type="number" id="startCash" min="500" step="100" value="1500" />
+          <button class="good" id="btnStart">Start</button>
+        </div>
+        <div class="hr"></div>
+        <div class="hint">
+          Rules in this prototype:
+          <ul>
+            <li>Roll dice → move → resolve space.</li>
+            <li>Apartments can be bought if unowned.</li>
+            <li>Rent is paid to the owner, scaled by bed upgrades (0–5).</li>
+            <li>You can upgrade beds on properties you own. Cost depends on the property tier.</li>
+            <li>Color set bonus: if you own the full set, base rent is multiplied.</li>
+            <li>Apartment Card spaces and Building Card spaces trigger random events.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="gameUI" style="display:none;">
+        <div class="row">
+          <button id="btnRoll" class="good">Roll</button>
+          <button id="btnBuy">Buy</button>
+          <button id="btnUpgrade">Upgrade Bed</button>
+          <button id="btnEnd" class="secondary">End Turn</button>
+          <button id="btnForfeit" class="danger">Forfeit</button>
+        </div>
+        <div class="hr"></div>
+
+        <div class="players" id="players"></div>
+
+        <div class="hr"></div>
+        <div class="grid">
+          <div>
+            <div class="title" style="font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Selected Space</div>
+            <div class="listItem" id="spaceInfo">
+              <div class="big">–</div>
+              <div class="mini">–</div>
+            </div>
+          </div>
+          <div>
+            <div class="title" style="font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Action Hint</div>
+            <div class="listItem">
+              <div class="big" id="hintTitle">–</div>
+              <div class="mini" id="hintText">Roll to begin.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="title" style="font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Game Log</div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Board + Market/Owned -->
+  <section class="card">
+    <div class="hd">
+      <div class="title">Board</div>
+      <div class="row">
+        <span class="pill">Beds: <span class="badge" id="bedLegend">0 Bare → 5 Luxury</span></span>
+      </div>
+    </div>
+    <canvas id="board" width="1200" height="740"></canvas>
+    <div class="bd">
+      <div class="panelSplit">
+        <div>
+          <div class="title" style="font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Market (Unowned Apartments)</div>
+          <div class="list" id="market"></div>
+        </div>
+        <div>
+          <div class="title" style="font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Current Player Properties</div>
+          <div class="list" id="owned"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/**
+ * Apartment Tycoon Prototype
+ * - 60 spaces around an ellipse track
+ * - Apartments in 8 color sets
+ * - Apartment Cards + Building Cards
+ * - Bed upgrades (0..5) rent scaling like Monopoly
+ */
+
+const COLORS = [
+  { key:"red", name:"Red", hex:"#ff3b3b" },
+  { key:"yellowOrange", name:"Yellow-Orange", hex:"#ffb703" },
+  { key:"blue", name:"Blue", hex:"#3a86ff" },
+  { key:"green", name:"Green", hex:"#2ecc71" },
+  { key:"violet", name:"Violet", hex:"#9b5de5" },
+  { key:"brown", name:"Brown", hex:"#8d6e63" },
+  { key:"limeGreen", name:"Lime Green", hex:"#b6ff3b" },
+  { key:"redOrange", name:"Red-Orange", hex:"#ff6d00" },
+];
+
+const BED_NAMES = ["Bare","Twin","Full","Queen","King","Luxury"];
+const TRACK_SIZE = 60;
+
+// Space types
+const SPACE = {
+  START:"START",
+  APARTMENT:"APARTMENT",
+  TAX:"TAX",
+  CARD_APT:"CARD_APT",
+  CARD_BLD:"CARD_BLD",
+  TRANSIT:"TRANSIT",
+  FREE:"FREE",
+};
+
+// --- Cards ---
+const apartmentCards = [
+  { title:"Tenant Boom", text:"Renters flood the market. Collect $100.", effect:(g,p)=> cash(p, +100) },
+  { title:"Late Rent", text:"You cover a shortfall. Pay $60.", effect:(g,p)=> cash(p, -60) },
+  { title:"Great Reviews", text:"Your next rent collected is doubled.", effect:(g,p)=> { p.status.doubleNextRent = true; } },
+  { title:"Noise Complaint", text:"Pay $40 per bed level across your properties (max $200).", effect:(g,p)=> {
+      const sumBeds = p.owned.reduce((a,id)=> a + g.spaces[id].beds, 0);
+      cash(p, -Math.min(200, sumBeds*40));
+    }
+  },
+  { title:"City Festival", text:"Advance 3 spaces.", effect:(g,p)=> moveBy(g,p,3,true) },
+  { title:"Lease Renewal", text:"Collect $25 per apartment you own.", effect:(g,p)=> cash(p, p.owned.length*25) },
+  { title:"Broken Heater", text:"Downgrade one random owned apartment by 1 bed level (min 0).", effect:(g,p)=> {
+      if(!p.owned.length) return;
+      const id = p.owned[randInt(0, p.owned.length-1)];
+      g.spaces[id].beds = Math.max(0, g.spaces[id].beds - 1);
+      log(`🛠️ ${p.name} had a repair: ${g.spaces[id].name} beds now ${g.spaces[id].beds} (${BED_NAMES[g.spaces[id].beds]}).`, "warn");
+    }
+  },
+  { title:"Security Deposit", text:"Collect $80.", effect:(g,p)=> cash(p,+80) },
+];
+
+const buildingCards = [
+  { title:"Renovation Grant", text:"Upgrade one apartment for free ( +1 bed level ).", effect:(g,p)=> {
+      const upgradable = p.owned.filter(id => g.spaces[id].beds < 5);
+      if(!upgradable.length) return;
+      const id = upgradable[randInt(0, upgradable.length-1)];
+      g.spaces[id].beds += 1;
+      log(`🏗️ Grant upgraded ${g.spaces[id].name} to ${BED_NAMES[g.spaces[id].beds]}.`, "good");
+    }
+  },
+  { title:"Property Tax Hike", text:"Pay 10% of your cash (min $50).", effect:(g,p)=> cash(p, -Math.max(50, Math.floor(p.cash*0.10))) },
+  { title:"New Appliance Package", text:"Next upgrade costs 50% less.", effect:(g,p)=> { p.status.halfNextUpgrade = true; } },
+  { title:"Inspection Pass", text:"Collect $70.", effect:(g,p)=> cash(p,+70) },
+  { title:"Elevator Failure", text:"Pay $80, then move back 2 spaces.", effect:(g,p)=> { cash(p,-80); moveBy(g,p,-2,true); } },
+  { title:"Investor Interest", text:"You may buy the next unowned apartment you land on for 20% off.", effect:(g,p)=> { p.status.discountNextBuy = true; } },
+  { title:"Contractor Overcharge", text:"Pay $120.", effect:(g,p)=> cash(p,-120) },
+  { title:"Community Partnerships", text:"Collect $40 per complete color set you own.", effect:(g,p)=> {
+      cash(p, countCompleteSets(g,p) * 40);
+    }
+  },
+];
+
+// --- Game State ---
+let game = null;
+
+function newGameState(numPlayers=2, startCash=1500){
+  const spaces = buildBoard();
+  const players = [];
+  const tokenColors = ["#7aa0ff","#ff7aa0","#7affc6","#ffd07a"];
+  for(let i=0;i<numPlayers;i++){
+    players.push({
+      id:i,
+      name:`Player ${i+1}`,
+      token: tokenColors[i],
+      pos:0,
+      cash:startCash,
+      owned:[],
+      status:{
+        doubleNextRent:false,
+        halfNextUpgrade:false,
+        discountNextBuy:false,
+      },
+      bankrupt:false,
+    });
+  }
+  return {
+    turn:0,
+    phase:"NEED_ROLL", // NEED_ROLL, RESOLVED
+    lastRoll:null,
+    spaces,
+    players,
+    decks:{
+      apt: shuffle([...apartmentCards]),
+      bld: shuffle([...buildingCards]),
+    },
+    discard:{
+      apt:[],
+      bld:[],
+    }
+  };
+}
+
+// --- Board Construction ---
+function buildBoard(){
+  // 60 spaces: mix of apartments + special spaces
+  // We'll create 40 apartments, 20 special.
+  const spaces = new Array(TRACK_SIZE).fill(null);
+
+  // Place specials at fixed indices
+  const specials = new Map([
+    [0,  {type:SPACE.START, name:"Move-In Day (Start)", text:"Collect $200 when you pass."}],
+    [5,  {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
+    [10, {type:SPACE.TAX, name:"City Tax", text:"Pay $150."}],
+    [12, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
+    [15, {type:SPACE.TRANSIT, name:"Subway Station", text:"Jump ahead to nearest Card space."}],
+    [20, {type:SPACE.FREE, name:"Community Park", text:"Take a break. Nothing happens."}],
+    [22, {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
+    [25, {type:SPACE.TAX, name:"Maintenance Fee", text:"Pay $100."}],
+    [27, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
+    [30, {type:SPACE.TRANSIT, name:"Moving Truck", text:"Advance to space 0, collect start pass money if applicable."}],
+    [35, {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
+    [40, {type:SPACE.TAX, name:"Insurance Premium", text:"Pay $120."}],
+    [42, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
+    [45, {type:SPACE.TRANSIT, name:"Real Estate Expo", text:"Move forward 5 spaces."}],
+    [50, {type:SPACE.FREE, name:"Coffee Shop", text:"Nothing happens."}],
+    [52, {type:SPACE.CARD_APT, name:"Apartment Card", text:"Draw an Apartment Card."}],
+    [55, {type:SPACE.TAX, name:"Utility Bill", text:"Pay $90."}],
+    [57, {type:SPACE.CARD_BLD, name:"Building Card", text:"Draw a Building Card."}],
+  ]);
+
+  // Define color sets distribution across apartments
+  // Each set has 5 apartments = 40 total
+  const setSize = 5;
+  const apartments = [];
+  let aptIndex = 1;
+
+  for(const c of COLORS){
+    for(let i=0;i<setSize;i++){
+      // Pricing & rent tiers (later sets slightly pricier)
+      const tier = COLORS.findIndex(x=>x.key===c.key) + 1; // 1..8
+      const price = 90 + tier*25 + i*10; // ~125..?
+      const baseRent = 14 + tier*6 + i*2; // ~22..?
+      const upgradeCost = 50 + tier*30; // ~80..290
+
+      apartments.push({
+        type:SPACE.APARTMENT,
+        name:`${c.name} Apt ${i+1}`,
+        setKey:c.key,
+        colorHex:c.hex,
+        price,
+        baseRent,
+        upgradeCost,
+        owner:null,
+        beds:0,
+        id:null,
+        text:"Buy it or pay rent if owned.",
+      });
+      aptIndex++;
+    }
+  }
+
+  // Fill spaces
+  let ai = 0;
+  for(let i=0;i<TRACK_SIZE;i++){
+    if(specials.has(i)){
+      spaces[i] = { id:i, ...specials.get(i) };
+    }else{
+      // assign apartment
+      const apt = apartments[ai++];
+      apt.id = i;
+      spaces[i] = apt;
+    }
+  }
+
+  return spaces;
+}
+
+// --- Utility ---
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+function currentPlayer(g){ return g.players[g.turn]; }
+function alivePlayers(g){ return g.players.filter(p=>!p.bankrupt); }
+
+function log(msg, cls=""){
+  const el = document.getElementById("log");
+  const div = document.createElement("div");
+  div.className = "line " + cls;
+  div.textContent = msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+function clearLog(){ document.getElementById("log").innerHTML = ""; }
+
+function cash(p, amount){
+  p.cash += amount;
+  if(amount>=0){
+    log(`💵 ${p.name} +$${amount}. (Cash: $${p.cash})`, "good");
+  }else{
+    log(`💸 ${p.name} -$${Math.abs(amount)}. (Cash: $${p.cash})`, "bad");
+  }
+}
+
+function countCompleteSets(g, p){
+  // color set complete if player owns all 5 in that set
+  let count = 0;
+  for(const c of COLORS){
+    const ids = g.spaces.filter(s => s.type===SPACE.APARTMENT && s.setKey===c.key).map(s=>s.id);
+    if(ids.length && ids.every(id => g.spaces[id].owner === p.id)) count++;
+  }
+  return count;
+}
+
+function ownsCompleteSet(g,p,setKey){
+  const ids = g.spaces.filter(s=>s.type===SPACE.APARTMENT && s.setKey===setKey).map(s=>s.id);
+  return ids.length && ids.every(id => g.spaces[id].owner === p.id);
+}
+
+function rentFor(space, g){
+  // rent scales with beds
+  // multiplier per bed level:
+  const bedMult = [1, 1.6, 2.4, 3.5, 5.0, 7.0];
+  let rent = Math.round(space.baseRent * bedMult[space.beds]);
+  // complete set bonus
+  const owner = g.players[space.owner];
+  if(owner && ownsCompleteSet(g, owner, space.setKey)){
+    rent = Math.round(rent * 1.25);
+  }
+  return rent;
+}
+
+function upgradePrice(space, player){
+  let cost = space.upgradeCost;
+  if(player.status.halfNextUpgrade){
+    cost = Math.ceil(cost * 0.5);
+  }
+  return cost;
+}
+
+function buyPrice(space, player){
+  let cost = space.price;
+  if(player.status.discountNextBuy){
+    cost = Math.ceil(cost * 0.8);
+  }
+  return cost;
+}
+
+// --- Movement & Resolution ---
+function moveBy(g, p, delta, resolveNow=false){
+  const old = p.pos;
+  let next = (p.pos + delta) % TRACK_SIZE;
+  if(next < 0) next += TRACK_SIZE;
+
+  // passing start if wrap forward
+  if(delta > 0 && (old + delta) >= TRACK_SIZE){
+    // passed start
+    cash(p, +200);
+    log(`🏁 ${p.name} passed Start and collected $200.`, "good");
+  }
+  p.pos = next;
+  if(resolveNow){
+    resolveSpace(g);
+  }
+}
+
+function drawCard(g, which){
+  const deck = g.decks[which];
+  const discard = g.discard[which];
+  if(deck.length === 0){
+    g.decks[which] = shuffle(discard.splice(0));
+  }
+  return g.decks[which].shift();
+}
+
+function resolveSpace(g){
+  const p = currentPlayer(g);
+  if(p.bankrupt) return;
+
+  const s = g.spaces[p.pos];
+  renderSpaceInfo(s, g);
+
+  if(s.type === SPACE.START){
+    log(`🏠 ${p.name} landed on Start.`, "warn");
+  }
+
+  if(s.type === SPACE.TAX){
+    const amount = taxAmount(s);
+    log(`🏛️ ${p.name} landed on ${s.name}.`, "warn");
+    cash(p, -amount);
+  }
+
+  if(s.type === SPACE.FREE){
+    log(`☕ ${p.name} landed on ${s.name}. Nothing happens.`, "warn");
+  }
+
+  if(s.type === SPACE.TRANSIT){
+    log(`🚇 ${p.name} hit ${s.name}.`, "warn");
+    if(p.pos === 15){
+      // jump to nearest card space forward
+      const cardSpaces = [5,12,22,27,35,42,52,57];
+      let best = null;
+      for(const idx of cardSpaces){
+        const dist = (idx - p.pos + TRACK_SIZE) % TRACK_SIZE;
+        if(dist === 0) continue;
+        if(best === null || dist < best.dist) best = { idx, dist };
+      }
+      moveBy(g,p,best.dist,true);
+      return;
+    }
+    if(p.pos === 30){
+      // go to start
+      p.pos = 0;
+      cash(p, +200);
+      log(`🚚 ${p.name} moved to Start and collected $200.`, "good");
+    }
+    if(p.pos === 45){
+      moveBy(g,p,5,true);
+      return;
+    }
+  }
+
+  if(s.type === SPACE.CARD_APT){
+    const card = drawCard(g,"apt");
+    log(`📦 Apartment Card: ${card.title} — ${card.text}`, "warn");
+    card.effect(g,p);
+  }
+
+  if(s.type === SPACE.CARD_BLD){
+    const card = drawCard(g,"bld");
+    log(`🏗️ Building Card: ${card.title} — ${card.text}`, "warn");
+    card.effect(g,p);
+  }
+
+  if(s.type === SPACE.APARTMENT){
+    if(s.owner === null){
+      log(`🏢 ${p.name} landed on unowned ${s.name}. Price $${s.price}.`, "warn");
+    }else if(s.owner === p.id){
+      log(`🔑 ${p.name} landed on their own ${s.name}.`, "good");
+    }else{
+      const owner = g.players[s.owner];
+      const rent = rentFor(s, g);
+      log(`🧾 ${p.name} owes rent $${rent} to ${owner.name} for ${s.name} (${BED_NAMES[s.beds]}).`, "bad");
+      // double next rent status on owner
+      let pay = rent;
+      if(owner.status.doubleNextRent){
+        pay = rent * 2;
+        owner.status.doubleNextRent = false;
+        log(`✨ ${owner.name}'s "double next rent" triggered! Rent doubled to $${pay}.`, "warn");
+      }
+      transferCash(p, owner, pay);
+    }
+  }
+
+  g.phase = "RESOLVED";
+  updateUI();
+  checkBankruptcy(g);
+  checkWin(g);
+}
+
+function transferCash(from, to, amount){
+  from.cash -= amount;
+  to.cash += amount;
+  log(`➡️ $${amount} moved from ${from.name} to ${to.name}.`, "warn");
+}
+
+function taxAmount(space){
+  if(space.name.includes("City")) return 150;
+  if(space.name.includes("Maintenance")) return 100;
+  if(space.name.includes("Insurance")) return 120;
+  if(space.name.includes("Utility")) return 90;
+  return 100;
+}
+
+function checkBankruptcy(g){
+  for(const p of g.players){
+    if(!p.bankrupt && p.cash < 0){
+      p.bankrupt = true;
+      // release their properties to the bank (unowned)
+      for(const id of p.owned){
+        const s = g.spaces[id];
+        s.owner = null;
+        s.beds = 0;
+      }
+      p.owned = [];
+      log(`💥 ${p.name} is BANKRUPT. Their properties return to the market.`, "bad");
+    }
+  }
+}
+
+function checkWin(g){
+  const alive = alivePlayers(g);
+  if(alive.length === 1){
+    log(`🏆 ${alive[0].name} wins Apartment Tycoon!`, "good");
+    disableActions(true);
+  }
+}
+
+// --- Actions ---
+function roll(){
+  const g = game;
+  const p = currentPlayer(g);
+  if(g.phase !== "NEED_ROLL") return;
+
+  const d1 = randInt(1,6);
+  const d2 = randInt(1,6);
+  const sum = d1 + d2;
+  g.lastRoll = { d1, d2, sum };
+
+  document.getElementById("diceOut").textContent = `${d1} + ${d2} = ${sum}`;
+  log(`🎲 ${p.name} rolled ${d1} and ${d2} (total ${sum}).`, "warn");
+
+  moveBy(g,p,sum,false);
+  g.phase = "MOVING";
+  // resolve now
+  resolveSpace(g);
+}
+
+function buy(){
+  const g = game;
+  const p = currentPlayer(g);
+  if(g.phase !== "RESOLVED") return;
+  const s = g.spaces[p.pos];
+  if(s.type !== SPACE.APARTMENT) return;
+  if(s.owner !== null) return;
+
+  const cost = buyPrice(s,p);
+  if(p.cash < cost){
+    log(`❌ Not enough cash to buy ${s.name}. Need $${cost}.`, "bad");
+    return;
+  }
+  p.cash -= cost;
+  s.owner = p.id;
+  p.owned.push(s.id);
+  log(`✅ ${p.name} bought ${s.name} for $${cost}.`, "good");
+  if(p.status.discountNextBuy){
+    p.status.discountNextBuy = false;
+    log(`📉 Discount used up.`, "warn");
+  }
+  updateUI();
+}
+
+function upgrade(){
+  const g = game;
+  const p = currentPlayer(g);
+  if(g.phase !== "RESOLVED") return;
+
+  // Upgrade the space you're on if owned by you, otherwise upgrade your cheapest upgradable property
+  let target = g.spaces[p.pos];
+  if(!(target.type===SPACE.APARTMENT && target.owner===p.id)){
+    const upgradable = p.owned
+      .map(id=>g.spaces[id])
+      .filter(s=>s.beds<5)
+      .sort((a,b)=>a.upgradeCost-b.upgradeCost);
+    if(!upgradable.length){
+      log(`ℹ️ No properties available to upgrade.`, "warn");
+      return;
+    }
+    target = upgradable[0];
+  }
+
+  if(target.beds >= 5){
+    log(`ℹ️ ${target.name} is already maxed (Luxury).`, "warn");
+    return;
+  }
+
+  const cost = upgradePrice(target,p);
+  if(p.cash < cost){
+    log(`❌ Not enough cash to upgrade. Need $${cost}.`, "bad");
+    return;
+  }
+  p.cash -= cost;
+  target.beds += 1;
+  log(`🛏️ ${p.name} upgraded ${target.name} to ${BED_NAMES[target.beds]} (Beds ${target.beds}). Cost $${cost}.`, "good");
+
+  if(p.status.halfNextUpgrade){
+    p.status.halfNextUpgrade = false;
+    log(`🧰 Half-price upgrade used up.`, "warn");
+  }
+  updateUI();
+}
+
+function endTurn(){
+  const g = game;
+  if(g.phase === "NEED_ROLL") return; // must roll
+  // next alive player
+  do{
+    g.turn = (g.turn + 1) % g.players.length;
+  }while(g.players[g.turn].bankrupt);
+
+  g.phase = "NEED_ROLL";
+  g.lastRoll = null;
+  document.getElementById("diceOut").textContent = "–";
+  log(`➡️ Turn passes to ${currentPlayer(g).name}.`, "warn");
+  updateUI();
+}
+
+function forfeit(){
+  const g = game;
+  const p = currentPlayer(g);
+  p.cash = -1;
+  checkBankruptcy(g);
+  updateUI();
+  checkWin(g);
+  if(alivePlayers(g).length>1){
+    endTurn();
+  }
+}
+
+// --- UI Rendering ---
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+
+function drawBoard(g){
+  // Clear
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+
+  // Track ellipse
+  const cx = canvas.width/2;
+  const cy = canvas.height/2 + 10;
+  const rx = 430;
+  const ry = 250;
+
+  // draw faint ellipse
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,.12)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Draw spaces as little rounded rectangles positioned on ellipse
+  const points = [];
+  for(let i=0;i<TRACK_SIZE;i++){
+    const t = (i / TRACK_SIZE) * Math.PI*2 - Math.PI/2;
+    const x = cx + rx * Math.cos(t);
+    const y = cy + ry * Math.sin(t);
+    points.push({x,y});
+  }
+
+  // draw each space
+  for(let i=0;i<TRACK_SIZE;i++){
+    const s = g.spaces[i];
+    const pt = points[i];
+
+    const w = 70;
+    const h = 28;
+
+    // background
+    ctx.save();
+    ctx.translate(pt.x, pt.y);
+    // rotate slightly to face outward
+    const ang = Math.atan2(pt.y-cy, pt.x-cx);
+    ctx.rotate(ang);
+
+    // fill
+    let fill = "rgba(255,255,255,.06)";
+    let stripe = "rgba(255,255,255,.08)";
+    if(s.type === SPACE.APARTMENT) stripe = s.colorHex;
+    if(s.type === SPACE.START) stripe = "rgba(122,160,255,.9)";
+    if(s.type === SPACE.TAX) stripe = "rgba(255,91,107,.9)";
+    if(s.type === SPACE.CARD_APT) stripe = "rgba(255,209,102,.9)";
+    if(s.type === SPACE.CARD_BLD) stripe = "rgba(69,212,131,.9)";
+    if(s.type === SPACE.TRANSIT) stripe = "rgba(155,93,229,.9)";
+    if(s.type === SPACE.FREE) stripe = "rgba(255,255,255,.25)";
+
+    roundRect(-w/2, -h/2, w, h, 10, fill, "rgba(255,255,255,.12)", 1);
+
+    // stripe
+    ctx.fillStyle = stripe;
+    ctx.globalAlpha = 0.9;
+    roundRect(-w/2, -h/2, 8, h, 6, stripe, null, 0);
+
+    // index label
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "rgba(233,236,255,.9)";
+    ctx.font = "12px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(i), 0, 0);
+
+    // beds indicator for apartments
+    if(s.type===SPACE.APARTMENT){
+      const beds = s.beds;
+      ctx.fillStyle = "rgba(233,236,255,.9)";
+      ctx.font = "11px system-ui";
+      ctx.textAlign = "right";
+      ctx.fillText("🛏".repeat(Math.min(3,beds)) + (beds>3?`+${beds-3}`:""), w/2 - 8, 0);
+      // owner dot
+      if(s.owner !== null){
+        const owner = g.players[s.owner];
+        ctx.beginPath();
+        ctx.fillStyle = owner.token;
+        ctx.arc(-w/2 + 18, 0, 5.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.35)";
+        ctx.stroke();
+      }
+    }
+
+    // highlight current player's space
+    const cp = currentPlayer(g);
+    if(cp && cp.pos === i){
+      ctx.strokeStyle = "rgba(255,255,255,.55)";
+      ctx.lineWidth = 2.5;
+      roundRect(-w/2, -h/2, w, h, 10, null, "rgba(255,255,255,.55)", 2.5);
+    }
+
+    ctx.restore();
+  }
+
+  // draw player tokens in center with mini labels
+  if(g.players){
+    let y = 50;
+    ctx.save();
+    ctx.fillStyle = "rgba(233,236,255,.85)";
+    ctx.font = "14px system-ui";
+    ctx.textAlign = "left";
+    ctx.fillText("Players:", 18, 30);
+    for(const p of g.players){
+      ctx.beginPath();
+      ctx.fillStyle = p.token;
+      ctx.arc(28, y, 7, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.35)";
+      ctx.stroke();
+      ctx.fillStyle = "rgba(233,236,255,.85)";
+      ctx.font = "12px system-ui";
+      ctx.fillText(`${p.name}  $${p.cash}${p.bankrupt?" (BANKRUPT)":""}`, 42, y+4);
+      y += 18;
+    }
+    ctx.restore();
+  }
+}
+
+function roundRect(x,y,w,h,r, fillStyle, strokeStyle, lineWidth){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  if(fillStyle){
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+  }
+  if(strokeStyle){
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth || 1;
+    ctx.stroke();
+  }
+}
+
+function renderPlayers(g){
+  const wrap = document.getElementById("players");
+  wrap.innerHTML = "";
+  g.players.forEach((p, idx)=>{
+    const div = document.createElement("div");
+    div.className = "playerBox" + (idx===g.turn ? " active":"");
+    const left = document.createElement("div");
+    left.className = "playerLeft";
+    const token = document.createElement("div");
+    token.className = "token";
+    token.style.background = p.token;
+
+    const info = document.createElement("div");
+    const nm = document.createElement("div");
+    nm.className = "playerName";
+    nm.textContent = p.name + (p.bankrupt ? " (BANKRUPT)" : "");
+    const kv = document.createElement("div");
+    kv.className = "kv";
+    kv.innerHTML = `
+      <span>Cash: <b>$${p.cash}</b></span>
+      <span>Pos: <b>${p.pos}</b></span>
+      <span>Apts: <b>${p.owned.length}</b></span>
+      <span>Sets: <b>${countCompleteSets(g,p)}</b></span>
+    `;
+    info.appendChild(nm);
+    info.appendChild(kv);
+
+    left.appendChild(token);
+    left.appendChild(info);
+
+    const right = document.createElement("div");
+    right.className = "kv";
+    right.innerHTML = `
+      <span class="badge">x2 Rent: <b>${p.status.doubleNextRent?"ON":"off"}</b></span>
+      <span class="badge">½ Upgrade: <b>${p.status.halfNextUpgrade?"ON":"off"}</b></span>
+      <span class="badge">-20% Buy: <b>${p.status.discountNextBuy?"ON":"off"}</b></span>
+    `;
+
+    div.appendChild(left);
+    div.appendChild(right);
+    wrap.appendChild(div);
+  });
+}
+
+function renderSpaceInfo(space, g){
+  const el = document.getElementById("spaceInfo");
+  const title = el.querySelector(".big");
+  const mini = el.querySelector(".mini");
+
+  title.textContent = `${space.id}: ${space.name}`;
+  if(space.type === SPACE.APARTMENT){
+    const owner = space.owner===null ? "Unowned" : g.players[space.owner].name;
+    mini.innerHTML = `
+      <div>Type: <b>Apartment</b> <span class="badge" style="margin-left:6px;border-color:${space.colorHex}">${COLORS.find(c=>c.key===space.setKey).name}</span></div>
+      <div>Owner: <b>${owner}</b></div>
+      <div>Price: <b>$${space.price}</b> • Base rent: <b>$${space.baseRent}</b> • Beds: <b>${space.beds}</b> (${BED_NAMES[space.beds]})</div>
+      <div>Upgrade cost: <b>$${space.upgradeCost}</b> • Current rent: <b>$${space.owner===null?"—":rentFor(space,g)}</b></div>
+    `;
+  }else{
+    mini.textContent = space.text || "";
+  }
+}
+
+function renderMarket(g){
+  const el = document.getElementById("market");
+  el.innerHTML = "";
+  const unowned = g.spaces.filter(s=>s.type===SPACE.APARTMENT && s.owner===null)
+    .sort((a,b)=>a.price-b.price);
+  for(const s of unowned.slice(0, 30)){
+    const div = document.createElement("div");
+    div.className = "listItem";
+    div.innerHTML = `
+      <div class="big"><span class="dot" style="background:${s.colorHex}; display:inline-block;"></span>
+        ${s.name} <span class="badge">$${s.price}</span>
+      </div>
+      <div class="mini">Base rent $${s.baseRent} • Upgrade $${s.upgradeCost}</div>
+    `;
+    el.appendChild(div);
+  }
+  if(unowned.length > 30){
+    const more = document.createElement("div");
+    more.className = "mini";
+    more.style.padding = "6px 4px 2px";
+    more.textContent = `…and ${unowned.length-30} more unowned apartments`;
+    el.appendChild(more);
+  }
+}
+
+function renderOwned(g){
+  const el = document.getElementById("owned");
+  el.innerHTML = "";
+  const p = currentPlayer(g);
+  const owned = p.owned.map(id=>g.spaces[id]).sort((a,b)=>a.setKey.localeCompare(b.setKey) || a.price-b.price);
+  if(!owned.length){
+    const div = document.createElement("div");
+    div.className = "mini";
+    div.style.padding="6px 4px";
+    div.textContent = "No properties yet. Buy an apartment when you land on one.";
+    el.appendChild(div);
+    return;
+  }
+  for(const s of owned){
+    const complete = ownsCompleteSet(g,p,s.setKey);
+    const div = document.createElement("div");
+    div.className = "listItem";
+    div.innerHTML = `
+      <div class="big">
+        <span class="dot" style="background:${s.colorHex}; display:inline-block;"></span>
+        ${s.name}
+        <span class="badge">Beds ${s.beds} (${BED_NAMES[s.beds]})</span>
+        ${complete ? `<span class="badge" style="border-color:${s.colorHex}">Complete Set</span>` : ``}
+      </div>
+      <div class="mini">Rent now: <b>$${rentFor(s,g)}</b> • Upgrade: <b>$${upgradePrice(s,p)}</b></div>
+    `;
+    el.appendChild(div);
+  }
+}
+
+function renderHint(g){
+  const p = currentPlayer(g);
+  const s = g.spaces[p.pos];
+  const hTitle = document.getElementById("hintTitle");
+  const hText = document.getElementById("hintText");
+
+  if(g.phase === "NEED_ROLL"){
+    hTitle.textContent = "Roll";
+    hText.textContent = "Click Roll to move.";
+    return;
+  }
+
+  // resolved
+  if(s.type === SPACE.APARTMENT){
+    if(s.owner === null){
+      hTitle.textContent = "Buy?";
+      hText.textContent = `You can buy this apartment for $${buyPrice(s,p)} (or end turn).`;
+    } else if(s.owner === p.id){
+      hTitle.textContent = "Upgrade Bed?";
+      hText.textContent = s.beds<5
+        ? `You can upgrade this apartment for $${upgradePrice(s,p)}.`
+        : "This apartment is already maxed (Luxury).";
+    } else {
+      hTitle.textContent = "Rent Paid";
+      hText.textContent = "Rent was handled automatically. End your turn.";
+    }
+    return;
+  }
+
+  hTitle.textContent = "End Turn";
+  hText.textContent = "Space resolved. End your turn.";
+}
+
+function disableActions(disabled){
+  document.getElementById("btnRoll").disabled = disabled;
+  document.getElementById("btnBuy").disabled = disabled;
+  document.getElementById("btnUpgrade").disabled = disabled;
+  document.getElementById("btnEnd").disabled = disabled;
+  document.getElementById("btnForfeit").disabled = disabled;
+}
+
+function updateUI(){
+  if(!game) return;
+  const g = game;
+  renderPlayers(g);
+  renderSpaceInfo(g.spaces[currentPlayer(g).pos], g);
+  renderMarket(g);
+  renderOwned(g);
+  renderHint(g);
+  drawBoard(g);
+
+  const p = currentPlayer(g);
+  document.getElementById("turnLabel").textContent = `${p.name}'s turn`;
+  document.getElementById("turnDot").style.background = p.token;
+
+  // button states
+  const s = g.spaces[p.pos];
+  document.getElementById("btnRoll").disabled = (g.phase !== "NEED_ROLL");
+  document.getElementById("btnEnd").disabled = (g.phase === "NEED_ROLL");
+
+  const canBuy = (g.phase==="RESOLVED" && s.type===SPACE.APARTMENT && s.owner===null);
+  document.getElementById("btnBuy").disabled = !canBuy;
+
+  const canUpgrade =
+    (g.phase==="RESOLVED") &&
+    (
+      (s.type===SPACE.APARTMENT && s.owner===p.id && s.beds<5) ||
+      (p.owned.some(id => g.spaces[id].beds < 5))
+    );
+  document.getElementById("btnUpgrade").disabled = !canUpgrade;
+}
+
+// --- Startup / Wiring ---
+document.getElementById("btnResetLog").addEventListener("click", clearLog);
+document.getElementById("btnNew").addEventListener("click", ()=>{
+  // back to setup
+  game = null;
+  document.getElementById("setup").style.display = "";
+  document.getElementById("gameUI").style.display = "none";
+  document.getElementById("turnLabel").textContent = "Not started";
+  document.getElementById("turnDot").style.background = "transparent";
+  document.getElementById("diceOut").textContent = "–";
+  clearLog();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+});
+
+document.getElementById("btnStart").addEventListener("click", ()=>{
+  const n = clamp(parseInt(document.getElementById("numPlayers").value,10), 2, 4);
+  const cash0 = Math.max(500, parseInt(document.getElementById("startCash").value,10) || 1500);
+  game = newGameState(n, cash0);
+
+  document.getElementById("setup").style.display = "none";
+  document.getElementById("gameUI").style.display = "";
+
+  clearLog();
+  log("🎉 Game started! Pass Start to collect $200.", "good");
+  log(`➡️ ${currentPlayer(game).name} goes first.`, "warn");
+  updateUI();
+});
+
+document.getElementById("btnRoll").addEventListener("click", ()=> roll());
+document.getElementById("btnBuy").addEventListener("click", ()=> buy());
+document.getElementById("btnUpgrade").addEventListener("click", ()=> upgrade());
+document.getElementById("btnEnd").addEventListener("click", ()=> endTurn());
+document.getElementById("btnForfeit").addEventListener("click", ()=> forfeit());
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+// draw a blank board at first load
+(function initBlank(){
+  const g = newGameState(2, 1500);
+  // hide players list
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawBoard(g);
+})();
+</script>
+</body>
+</html>
