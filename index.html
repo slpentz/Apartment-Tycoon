@@ -239,11 +239,10 @@
             getAuth, signInAnonymously, onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-        const firebaseConfig = window.__FIREBASE_CONFIG__; // set in Step 3
-        if (!firebaseConfig) {
-            alert("Missing Firebase config. Follow Step 3 and paste your config.");
-            throw new Error("Missing Firebase config");
-        }
+        const firebaseConfig = window.__FIREBASE_CONFIG__;
+        if (!firebaseConfig?.apiKey) throw new Error("Missing firebase config");
+        const app = initializeApp(firebaseConfig);
+        
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
