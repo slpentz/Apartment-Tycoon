@@ -331,9 +331,9 @@
                 // icon + initials
                 const initials = (p.name || "P").slice(0, 2).toUpperCase();
                 t.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;line-height:1;">
-            <div style="font-size:14px">${p.icon || "🙂"}</div>
-            <small>${initials}</small>
-          </div>`;
+                <div style="font-size:14px">${p.icon || "🙂"}</div>
+                <small>${initials}</small>
+              </div>`;
                 layer.appendChild(t);
             }
         }
@@ -352,9 +352,9 @@
                 div.className = "listItem";
                 const turnBadge = (state?.turnUid === p.uid) ? ` <span class="pill" style="border-color:rgba(123,155,255,.35);color:var(--text)">TURN</span>` : "";
                 div.innerHTML = `
-            <div class="big">${p.icon || "🙂"} ${p.name || "Player"}${turnBadge}</div>
-            <div class="mini">Cash: <b>$${p.cash ?? 0}</b> • Pos: <b>${p.pos ?? 0}</b></div>
-          `;
+                <div class="big">${p.icon || "🙂"} ${p.name || "Player"}${turnBadge}</div>
+                <div class="mini">Cash: <b>$${p.cash ?? 0}</b> • Pos: <b>${p.pos ?? 0}</b></div>
+              `;
                 el.appendChild(div);
             }
         }
@@ -570,11 +570,11 @@
         log("Ready. Add Firebase config (Step 3), then Create Room.", "warnTxt");
     </script>
 
-  
-    <!-- STEP 3 puts config here -->
+
+    <!-- STEP 3: Firebase config -->
     <script>
         window.__FIREBASE_CONFIG__ = {
-            apiKey: "AIzaSyC0vtVUiftBEWSoIzU1Ewfyyh0uPUkM",
+            apiKey: "AIzaSyC0vtVUiftBEWSoIzU1Ewfyh0uPUkM",
             authDomain: "apartment-tycoon.firebaseapp.com",
             databaseURL: "https://apartment-tycoon-default-rtdb.firebaseio.com",
             projectId: "apartment-tycoon",
@@ -583,6 +583,5 @@
             appId: "1:398055726858:web:0847944b24edbc03ece4f3"
         };
     </script>
-
 </body>
 </html>
