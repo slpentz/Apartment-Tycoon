@@ -390,12 +390,17 @@
         }
 
         async function ensureSignedIn() {
-            await signInAnonymously(auth);
-            return new Promise((resolve) => {
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        myUid = user.uid;
-                        resolve(user.uid);
+            // already signed in?
+            if (auth.currentUser?.uid) {
+                myUid = auth.currentUser.uid;
+                return myUid;
+            }
+
+            // sign in
+            const cred = await signInAnonymously(auth);
+            myUid = cred.user.uid;
+            return myUid;
+        }
                     }
                 });
             });
@@ -447,7 +452,7 @@
                     },
                 };
 
-                console.log("[createRoom] writing:", { path: `rooms/${code}`, init });
+                console.log("[createRoom] writing:", { path:`rooms/${code}`, init });
 
                 await set(roomRef, init);
 
