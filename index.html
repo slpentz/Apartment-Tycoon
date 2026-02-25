@@ -111,471 +111,478 @@
   </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>Apartment Tycoon — Multiplayer</h1>
-    <div class="sub">Uses your board image + live synced avatars (room code). Deploy on Netlify / GitHub Pages.</div>
-  </div>
-  <div class="row">
-    <span class="pill"><span class="dot" id="turnDot"></span><span id="turnLabel">Not connected</span></span>
-    <span class="pill">Dice: <b id="diceOut">–</b></span>
-  </div>
-</header>
-
-<div class="wrap">
-  <div class="grid">
-
-    <!-- LEFT: Lobby / Controls -->
-    <section class="card">
-      <div class="hd"><div class="title">Room + Avatar</div></div>
-      <div class="bd">
-        <div class="row" style="align-items:flex-end">
-          <div style="flex:1">
-            <label>Display name</label>
-            <input id="name" placeholder="Hydra, Player 1, etc" maxlength="16" />
-          </div>
-          <div style="width:110px">
-            <label>Icon</label>
-            <select id="icon">
-              <option>😺</option><option>🦊</option><option>🐺</option><option>🐼</option><option>🐸</option>
-              <option>🦁</option><option>🐵</option><option>🧙</option><option>🧑‍🔧</option><option>🧑‍🚀</option>
-            </select>
-          </div>
+    <header>
+        <div>
+            <h1>Apartment Tycoon — Multiplayer</h1>
+            <div class="sub">Uses your board image + live synced avatars (room code). Deploy on Netlify / GitHub Pages.</div>
         </div>
-
-        <div class="row" style="margin-top:10px">
-          <div style="flex:1">
-            <label>Color</label>
-            <input id="color" type="color" value="#7aa0ff" />
-          </div>
-          <div style="width:140px">
-            <label>Start cash</label>
-            <input id="startCash" type="number" value="4500" min="1000" step="100" />
-          </div>
-        </div>
-
-        <div class="hr"></div>
-
         <div class="row">
-          <button class="good" id="btnCreate">Create Room</button>
-          <button class="secondary" id="btnJoin">Join Room</button>
+            <span class="pill"><span class="dot" id="turnDot"></span><span id="turnLabel">Not connected</span></span>
+            <span class="pill">Dice: <b id="diceOut">–</b></span>
         </div>
+    </header>
 
-        <div class="row" style="margin-top:10px">
-          <div style="flex:1">
-            <label>Room code</label>
-            <input id="roomCode" placeholder="e.g. K9F2Q" maxlength="10" />
-          </div>
-          <button class="secondary" id="btnCopy">Copy</button>
+    <div class="wrap">
+        <div class="grid">
+
+            <!-- LEFT: Lobby / Controls -->
+            <section class="card">
+                <div class="hd"><div class="title">Room + Avatar</div></div>
+                <div class="bd">
+                    <div class="row" style="align-items:flex-end">
+                        <div style="flex:1">
+                            <label>Display name</label>
+                            <input id="name" placeholder="Hydra, Player 1, etc" maxlength="16" />
+                        </div>
+                        <div style="width:110px">
+                            <label>Icon</label>
+                            <select id="icon">
+                                <option>😺</option>
+                                <option>🦊</option>
+                                <option>🐺</option>
+                                <option>🐼</option>
+                                <option>🐸</option>
+                                <option>🦁</option>
+                                <option>🐵</option>
+                                <option>🧙</option>
+                                <option>🧑‍🔧</option>
+                                <option>🧑‍🚀</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px">
+                        <div style="flex:1">
+                            <label>Color</label>
+                            <input id="color" type="color" value="#7aa0ff" />
+                        </div>
+                        <div style="width:140px">
+                            <label>Start cash</label>
+                            <input id="startCash" type="number" value="4500" min="1000" step="100" />
+                        </div>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <div class="row">
+                        <button class="good" id="btnCreate">Create Room</button>
+                        <button class="secondary" id="btnJoin">Join Room</button>
+                    </div>
+
+                    <div class="row" style="margin-top:10px">
+                        <div style="flex:1">
+                            <label>Room code</label>
+                            <input id="roomCode" placeholder="e.g. K9F2Q" maxlength="10" />
+                        </div>
+                        <button class="secondary" id="btnCopy">Copy</button>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <div class="row">
+                        <button id="btnRoll" class="good" disabled>Roll (current player)</button>
+                        <button id="btnEnd" class="secondary" disabled>End Turn</button>
+                        <button id="btnReset" class="danger" disabled>Reset Game</button>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <div class="title" style="margin-bottom:8px;">Players</div>
+                    <div class="list" id="playersList"></div>
+
+                    <div class="hr"></div>
+
+                    <div class="title" style="margin-bottom:8px;">Log</div>
+                    <div class="log" id="log"></div>
+                </div>
+            </section>
+
+            <!-- RIGHT: Board -->
+            <section class="card">
+                <div class="hd"><div class="title">Board (your design)</div></div>
+                <div class="boardWrap" id="boardWrap">
+                    <img class="boardImg" src="./board1.jpg" alt="Apartment Tycoon board" />
+                    <div class="hotspotLayer" id="hotspots"></div>
+                    <div class="tokenLayer" id="tokens"></div>
+                </div>
+                <div class="bd">
+                    <div class="mini">
+                        Tap a space to show its label (we’ll map every apartment + card space next). Tokens move live.
+                    </div>
+                </div>
+            </section>
+
         </div>
+    </div>
 
-        <div class="hr"></div>
+    <script type="module">
+        // ---------- Firebase (add your config in STEP 3 below) ----------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import {
+            getDatabase, ref, set, get, update, onValue, push, serverTimestamp, runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import {
+            getAuth, signInAnonymously, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-        <div class="row">
-          <button id="btnRoll" class="good" disabled>Roll (current player)</button>
-          <button id="btnEnd" class="secondary" disabled>End Turn</button>
-          <button id="btnReset" class="danger" disabled>Reset Game</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="title" style="margin-bottom:8px;">Players</div>
-        <div class="list" id="playersList"></div>
-
-        <div class="hr"></div>
-
-        <div class="title" style="margin-bottom:8px;">Log</div>
-        <div class="log" id="log"></div>
-      </div>
-    </section>
-
-    <!-- RIGHT: Board -->
-    <section class="card">
-      <div class="hd"><div class="title">Board (your design)</div></div>
-      <div class="boardWrap" id="boardWrap">
-        <img class="boardImg" src="./board1.jpg" alt="Apartment Tycoon board" />
-        <div class="hotspotLayer" id="hotspots"></div>
-        <div class="tokenLayer" id="tokens"></div>
-      </div>
-      <div class="bd">
-        <div class="mini">
-          Tap a space to show its label (we’ll map every apartment + card space next). Tokens move live.
-        </div>
-      </div>
-    </section>
-
-  </div>
-</div>
-
-<script type="module">
-  // ---------- Firebase (add your config in STEP 3 below) ----------
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import {
-    getDatabase, ref, set, get, update, onValue, push, serverTimestamp, runTransaction
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-  import {
-    getAuth, signInAnonymously, onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-  const firebaseConfig = window.__FIREBASE_CONFIG__; // set in Step 3
-  if(!firebaseConfig) {
-    alert("Missing Firebase config. Follow Step 3 and paste your config.");
-    throw new Error("Missing Firebase config");
-  }
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const auth = getAuth(app);
-
-  // ---------- Utilities ----------
-  const $ = (id)=>document.getElementById(id);
-  const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
-  const randInt = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-
-  function log(msg, cls=""){
-    const el = $("log");
-    const div = document.createElement("div");
-    div.className = "line " + cls;
-    div.textContent = msg;
-    el.appendChild(div);
-    el.scrollTop = el.scrollHeight;
-  }
-
-  function makeRoomCode(){
-    const chars="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-    let s="";
-    for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
-    return s;
-  }
-
-  // ---------- Board mapping ----------
-  // IMPORTANT:
-  // These "spaces" are rectangles placed in % coords over the image (left, top, width, height).
-  // We’ll fill all 60+ later, but this is enough to prove multiplayer + tokens.
-  //
-  // You can add more by copying an entry and adjusting percentages.
-  //
-  const spaces = [
-    { id:0,  name:"Lobby (Start)",      x:12, y:88, w:18, h:9, special:true },
-    { id:1,  name:"A-1",                x:32, y:88, w:6,  h:9 },
-    { id:2,  name:"A-2",                x:39, y:88, w:6,  h:9 },
-    { id:3,  name:"Apartment Card",     x:46, y:88, w:6,  h:9, special:true },
-    { id:4,  name:"Swimming Pool",      x:53, y:88, w:9,  h:9, special:true },
-    { id:5,  name:"A-3",                x:63, y:88, w:6,  h:9 },
-    { id:6,  name:"A-4",                x:70, y:88, w:6,  h:9 },
-    { id:7,  name:"A-5",                x:77, y:88, w:6,  h:9 },
-    { id:8,  name:"Laundry (pay)",      x:84, y:88, w:8,  h:9, special:true },
-    { id:9,  name:"Stairs / Move Up",   x:92, y:86, w:7,  h:12, special:true },
-
-    // Top-left elevator door-ish (end)
-    { id:59, name:"Elevator Door (Top)", x:15, y:7, w:10, h:10, special:true },
-
-    // Speakeasy in penthouse region (placeholder)
-    { id:56, name:"Humstring’s Speakeasy", x:58, y:12, w:14, h:10, special:true },
-  ];
-
-  // Map a track position (0..59) to a space rectangle center.
-  // For now: if we don’t have a rectangle for a given id, we fall back to Lobby center.
-  function spaceCenter(id){
-    const s = spaces.find(x=>x.id===id) || spaces[0];
-    return { cx: s.x + s.w/2, cy: s.y + s.h/2 };
-  }
-
-  function renderHotspots(){
-    const layer = $("hotspots");
-    layer.innerHTML = "";
-    for(const s of spaces){
-      const d = document.createElement("div");
-      d.className = "hotspot";
-      d.style.left = s.x + "%";
-      d.style.top  = s.y + "%";
-      d.style.width = s.w + "%";
-      d.style.height= s.h + "%";
-      d.dataset.special = s.special ? "true" : "false";
-
-      const label = document.createElement("div");
-      label.className = "hotspotLabel";
-      label.textContent = s.name;
-
-      d.appendChild(label);
-      d.addEventListener("click", (e)=>{
-        e.preventDefault();
-        log(`ℹ️ Space ${s.id}: ${s.name}`, "warnTxt");
-      });
-
-      layer.appendChild(d);
-    }
-  }
-
-  function renderTokens(state){
-    const layer = $("tokens");
-    layer.innerHTML = "";
-    const players = state?.players ? Object.values(state.players) : [];
-    for(const p of players){
-      const { cx, cy } = spaceCenter(p.pos ?? 0);
-
-      const t = document.createElement("div");
-      t.className = "token";
-      t.style.left = cx + "%";
-      t.style.top  = cy + "%";
-      t.style.background = p.color || "#7aa0ff";
-
-      // icon + initials
-      const initials = (p.name || "P").slice(0,2).toUpperCase();
-      t.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;line-height:1;">
-        <div style="font-size:14px">${p.icon || "🙂"}</div>
-        <small>${initials}</small>
-      </div>`;
-      layer.appendChild(t);
-    }
-  }
-
-  function renderPlayers(state){
-    const el = $("playersList");
-    el.innerHTML = "";
-    const players = state?.players ? Object.values(state.players) : [];
-    if(players.length === 0){
-      el.innerHTML = `<div class="mini" style="padding:6px 4px;">No players yet.</div>`;
-      return;
-    }
-    players.sort((a,b)=> (a.joinedAt||0)-(b.joinedAt||0));
-    for(const p of players){
-      const div = document.createElement("div");
-      div.className = "listItem";
-      const turnBadge = (state?.turnUid === p.uid) ? ` <span class="pill" style="border-color:rgba(123,155,255,.35);color:var(--text)">TURN</span>` : "";
-      div.innerHTML = `
-        <div class="big">${p.icon || "🙂"} ${p.name || "Player"}${turnBadge}</div>
-        <div class="mini">Cash: <b>$${p.cash ?? 0}</b> • Pos: <b>${p.pos ?? 0}</b></div>
-      `;
-      el.appendChild(div);
-    }
-  }
-
-  function setTurnPill(state){
-    if(!state){ $("turnLabel").textContent="Not connected"; $("turnDot").style.background="transparent"; return; }
-    const turnUid = state.turnUid;
-    const turnPlayer = state.players?.[turnUid];
-    $("turnLabel").textContent = turnPlayer ? `${turnPlayer.name}'s turn` : "Turn: —";
-    $("turnDot").style.background = turnPlayer?.color || "transparent";
-    $("diceOut").textContent = state.lastRoll ?? "–";
-  }
-
-  // ---------- Multiplayer State ----------
-  let myUid = null;
-  let room = null; // room code
-  let roomRef = null;
-
-  function myProfile(){
-    const name = ($("name").value || "Player").trim().slice(0,16);
-    const icon = $("icon").value;
-    const color = $("color").value;
-    const cash = Math.max(1000, parseInt($("startCash").value,10) || 4500);
-    return { name, icon, color, cash };
-  }
-
-  async function ensureSignedIn(){
-    await signInAnonymously(auth);
-    return new Promise((resolve)=>{
-      onAuthStateChanged(auth, (user)=>{
-        if(user){
-          myUid = user.uid;
-          resolve(user.uid);
+        const firebaseConfig = window.__FIREBASE_CONFIG__; // set in Step 3
+        if (!firebaseConfig) {
+            alert("Missing Firebase config. Follow Step 3 and paste your config.");
+            throw new Error("Missing Firebase config");
         }
-      });
-    });
-  }
 
-  async function createRoom(){
-    await ensureSignedIn();
-    const code = makeRoomCode();
-    room = code;
-    $("roomCode").value = code;
-    roomRef = ref(db, `rooms/${code}`);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
 
-    const prof = myProfile();
+        // ---------- Utilities ----------
+        const $ = (id) => document.getElementById(id);
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const randInt = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 
-    // Create room state
-    const init = {
-      createdAt: Date.now(),
-      ownerUid: myUid,
-      turnUid: myUid,
-      lastRoll: null,
-      started: true,
-      players: {
-        [myUid]: {
-          uid: myUid,
-          name: prof.name,
-          icon: prof.icon,
-          color: prof.color,
-          cash: prof.cash,
-          pos: 0,
-          joinedAt: Date.now()
+        function log(msg, cls = "") {
+            const el = $("log");
+            const div = document.createElement("div");
+            div.className = "line " + cls;
+            div.textContent = msg;
+            el.appendChild(div);
+            el.scrollTop = el.scrollHeight;
         }
-      }
-    };
 
-    await set(roomRef, init);
-    log(`✅ Room created: ${code}. Share this code.`, "goodTxt");
-    attachRoomListener();
-    enableGameButtons(true);
-  }
+        function makeRoomCode() {
+            const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+            let s = "";
+            for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random() * chars.length)];
+            return s;
+        }
 
-  async function joinRoom(){
-    await ensureSignedIn();
-    const code = ($("roomCode").value || "").trim().toUpperCase();
-    if(!code){ log("Enter a room code first.", "badTxt"); return; }
+        // ---------- Board mapping ----------
+        // IMPORTANT:
+        // These "spaces" are rectangles placed in % coords over the image (left, top, width, height).
+        // We’ll fill all 60+ later, but this is enough to prove multiplayer + tokens.
+        //
+        // You can add more by copying an entry and adjusting percentages.
+        //
+        const spaces = [
+            { id: 0, name: "Lobby (Start)", x: 12, y: 88, w: 18, h: 9, special: true },
+            { id: 1, name: "A-1", x: 32, y: 88, w: 6, h: 9 },
+            { id: 2, name: "A-2", x: 39, y: 88, w: 6, h: 9 },
+            { id: 3, name: "Apartment Card", x: 46, y: 88, w: 6, h: 9, special: true },
+            { id: 4, name: "Swimming Pool", x: 53, y: 88, w: 9, h: 9, special: true },
+            { id: 5, name: "A-3", x: 63, y: 88, w: 6, h: 9 },
+            { id: 6, name: "A-4", x: 70, y: 88, w: 6, h: 9 },
+            { id: 7, name: "A-5", x: 77, y: 88, w: 6, h: 9 },
+            { id: 8, name: "Laundry (pay)", x: 84, y: 88, w: 8, h: 9, special: true },
+            { id: 9, name: "Stairs / Move Up", x: 92, y: 86, w: 7, h: 12, special: true },
 
-    room = code;
-    roomRef = ref(db, `rooms/${code}`);
+            // Top-left elevator door-ish (end)
+            { id: 59, name: "Elevator Door (Top)", x: 15, y: 7, w: 10, h: 10, special: true },
 
-    const snap = await get(roomRef);
-    if(!snap.exists()){ log("Room not found.", "badTxt"); return; }
+            // Speakeasy in penthouse region (placeholder)
+            { id: 56, name: "Humstring’s Speakeasy", x: 58, y: 12, w: 14, h: 10, special: true },
+        ];
 
-    const prof = myProfile();
+        // Map a track position (0..59) to a space rectangle center.
+        // For now: if we don’t have a rectangle for a given id, we fall back to Lobby center.
+        function spaceCenter(id) {
+            const s = spaces.find(x => x.id === id) || spaces[0];
+            return { cx: s.x + s.w / 2, cy: s.y + s.h / 2 };
+        }
 
-    // Add player
-    await update(ref(db, `rooms/${code}/players/${myUid}`), {
-      uid: myUid,
-      name: prof.name,
-      icon: prof.icon,
-      color: prof.color,
-      cash: prof.cash,
-      pos: 0,
-      joinedAt: Date.now()
-    });
+        function renderHotspots() {
+            const layer = $("hotspots");
+            layer.innerHTML = "";
+            for (const s of spaces) {
+                const d = document.createElement("div");
+                d.className = "hotspot";
+                d.style.left = s.x + "%";
+                d.style.top = s.y + "%";
+                d.style.width = s.w + "%";
+                d.style.height = s.h + "%";
+                d.dataset.special = s.special ? "true" : "false";
 
-    log(`✅ Joined room: ${code}.`, "goodTxt");
-    attachRoomListener();
-    enableGameButtons(true);
-  }
+                const label = document.createElement("div");
+                label.className = "hotspotLabel";
+                label.textContent = s.name;
 
-  function attachRoomListener(){
-    onValue(roomRef, (snap)=>{
-      const state = snap.val();
-      window.__STATE__ = state; // for debugging
-      setTurnPill(state);
-      renderPlayers(state);
-      renderTokens(state);
+                d.appendChild(label);
+                d.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    log(`ℹ️ Space ${s.id}: ${s.name}`, "warnTxt");
+                });
 
-      // Only turn player can roll/end
-      const isMyTurn = state?.turnUid === myUid;
-      $("btnRoll").disabled = !isMyTurn;
-      $("btnEnd").disabled = !isMyTurn;
-      $("btnReset").disabled = !(state?.ownerUid === myUid);
-    });
-  }
+                layer.appendChild(d);
+            }
+        }
 
-  function enableGameButtons(enabled){
-    // roll/end are controlled by turn; this just unlocks UI after connect
-    $("btnRoll").disabled = !enabled;
-    $("btnEnd").disabled = !enabled;
-    $("btnReset").disabled = !enabled;
-  }
+        function renderTokens(state) {
+            const layer = $("tokens");
+            layer.innerHTML = "";
+            const players = state?.players ? Object.values(state.players) : [];
+            for (const p of players) {
+                const { cx, cy } = spaceCenter(p.pos ?? 0);
 
-  async function roll(){
-    if(!room) return;
-    const d1 = randInt(1,6), d2 = randInt(1,6);
-    const sum = d1 + d2;
+                const t = document.createElement("div");
+                t.className = "token";
+                t.style.left = cx + "%";
+                t.style.top = cy + "%";
+                t.style.background = p.color || "#7aa0ff";
 
-    await runTransaction(roomRef, (state)=>{
-      if(!state) return state;
-      if(state.turnUid !== myUid) return state;
+                // icon + initials
+                const initials = (p.name || "P").slice(0, 2).toUpperCase();
+                t.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;line-height:1;">
+            <div style="font-size:14px">${p.icon || "🙂"}</div>
+            <small>${initials}</small>
+          </div>`;
+                layer.appendChild(t);
+            }
+        }
 
-      const me = state.players?.[myUid];
-      if(!me) return state;
+        function renderPlayers(state) {
+            const el = $("playersList");
+            el.innerHTML = "";
+            const players = state?.players ? Object.values(state.players) : [];
+            if (players.length === 0) {
+                el.innerHTML = `<div class="mini" style="padding:6px 4px;">No players yet.</div>`;
+                return;
+            }
+            players.sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+            for (const p of players) {
+                const div = document.createElement("div");
+                div.className = "listItem";
+                const turnBadge = (state?.turnUid === p.uid) ? ` <span class="pill" style="border-color:rgba(123,155,255,.35);color:var(--text)">TURN</span>` : "";
+                div.innerHTML = `
+            <div class="big">${p.icon || "🙂"} ${p.name || "Player"}${turnBadge}</div>
+            <div class="mini">Cash: <b>$${p.cash ?? 0}</b> • Pos: <b>${p.pos ?? 0}</b></div>
+          `;
+                el.appendChild(div);
+            }
+        }
 
-      const nextPos = ((me.pos || 0) + sum) % 60;
-      me.pos = nextPos;
+        function setTurnPill(state) {
+            if (!state) { $("turnLabel").textContent = "Not connected"; $("turnDot").style.background = "transparent"; return; }
+            const turnUid = state.turnUid;
+            const turnPlayer = state.players?.[turnUid];
+            $("turnLabel").textContent = turnPlayer ? `${turnPlayer.name}'s turn` : "Turn: —";
+            $("turnDot").style.background = turnPlayer?.color || "transparent";
+            $("diceOut").textContent = state.lastRoll ?? "–";
+        }
 
-      state.lastRoll = `${d1}+${d2}=${sum}`;
-      state.players[myUid] = me;
-      return state;
-    });
+        // ---------- Multiplayer State ----------
+        let myUid = null;
+        let room = null; // room code
+        let roomRef = null;
 
-    log(`🎲 You rolled ${d1} + ${d2} = ${sum}`, "warnTxt");
-  }
+        function myProfile() {
+            const name = ($("name").value || "Player").trim().slice(0, 16);
+            const icon = $("icon").value;
+            const color = $("color").value;
+            const cash = Math.max(1000, parseInt($("startCash").value, 10) || 4500);
+            return { name, icon, color, cash };
+        }
 
-  async function endTurn(){
-    if(!room) return;
+        async function ensureSignedIn() {
+            await signInAnonymously(auth);
+            return new Promise((resolve) => {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        myUid = user.uid;
+                        resolve(user.uid);
+                    }
+                });
+            });
+        }
 
-    await runTransaction(roomRef, (state)=>{
-      if(!state) return state;
-      if(state.turnUid !== myUid) return state;
+        async function createRoom() {
+            await ensureSignedIn();
+            const code = makeRoomCode();
+            room = code;
+            $("roomCode").value = code;
+            roomRef = ref(db, `rooms/${code}`);
 
-      const ids = Object.keys(state.players || {});
-      if(ids.length < 2) return state;
+            const prof = myProfile();
 
-      // rotate by join order
-      const list = ids
-        .map(uid => state.players[uid])
-        .sort((a,b)=>(a.joinedAt||0)-(b.joinedAt||0))
-        .map(p=>p.uid);
+            // Create room state
+            const init = {
+                createdAt: Date.now(),
+                ownerUid: myUid,
+                turnUid: myUid,
+                lastRoll: null,
+                started: true,
+                players: {
+                    [myUid]: {
+                        uid: myUid,
+                        name: prof.name,
+                        icon: prof.icon,
+                        color: prof.color,
+                        cash: prof.cash,
+                        pos: 0,
+                        joinedAt: Date.now()
+                    }
+                }
+            };
 
-      const i = list.indexOf(state.turnUid);
-      const next = list[(i+1) % list.length];
-      state.turnUid = next;
-      return state;
-    });
+            await set(roomRef, init);
+            log(`✅ Room created: ${code}. Share this code.`, "goodTxt");
+            attachRoomListener();
+            enableGameButtons(true);
+        }
 
-    log(`➡️ Ended turn.`, "warnTxt");
-  }
+        async function joinRoom() {
+            await ensureSignedIn();
+            const code = ($("roomCode").value || "").trim().toUpperCase();
+            if (!code) { log("Enter a room code first.", "badTxt"); return; }
 
-  async function resetGame(){
-    if(!room) return;
-    await runTransaction(roomRef, (state)=>{
-      if(!state) return state;
-      if(state.ownerUid !== myUid) return state;
+            room = code;
+            roomRef = ref(db, `rooms/${code}`);
 
-      // reset positions + cash to their chosen starting cash (keep avatars)
-      for(const uid of Object.keys(state.players || {})){
-        state.players[uid].pos = 0;
-        // keep cash as-is (or reset if you want):
-        // state.players[uid].cash = state.players[uid].cashStart ?? state.players[uid].cash;
-      }
-      state.turnUid = state.ownerUid;
-      state.lastRoll = null;
-      return state;
-    });
-    log(`♻️ Game reset by host.`, "warnTxt");
-  }
+            const snap = await get(roomRef);
+            if (!snap.exists()) { log("Room not found.", "badTxt"); return; }
 
-  async function copyCode(){
-    const code = ($("roomCode").value || "").trim();
-    if(!code) return;
-    try{
-      await navigator.clipboard.writeText(code);
-      log(`📋 Copied room code: ${code}`, "goodTxt");
-    }catch{
-      log(`Copy failed. Manually share: ${code}`, "warnTxt");
-    }
-  }
+            const prof = myProfile();
 
-  // ---------- Wire UI ----------
-  $("btnCreate").addEventListener("click", createRoom);
-  $("btnJoin").addEventListener("click", joinRoom);
-  $("btnRoll").addEventListener("click", roll);
-  $("btnEnd").addEventListener("click", endTurn);
-  $("btnReset").addEventListener("click", resetGame);
-  $("btnCopy").addEventListener("click", copyCode);
+            // Add player
+            await update(ref(db, `rooms/${code}/players/${myUid}`), {
+                uid: myUid,
+                name: prof.name,
+                icon: prof.icon,
+                color: prof.color,
+                cash: prof.cash,
+                pos: 0,
+                joinedAt: Date.now()
+            });
 
-  renderHotspots();
-  log("Ready. Add Firebase config (Step 3), then Create Room.", "warnTxt");
-</script>
+            log(`✅ Joined room: ${code}.`, "goodTxt");
+            attachRoomListener();
+            enableGameButtons(true);
+        }
 
-<!-- STEP 3 puts config here -->
-<script>
-    // Paste your Firebase config object into __FIREBASE_CONFIG__ in Step 3.
-    
+        function attachRoomListener() {
+            onValue(roomRef, (snap) => {
+                const state = snap.val();
+                window.__STATE__ = state; // for debugging
+                setTurnPill(state);
+                renderPlayers(state);
+                renderTokens(state);
+
+                // Only turn player can roll/end
+                const isMyTurn = state?.turnUid === myUid;
+                $("btnRoll").disabled = !isMyTurn;
+                $("btnEnd").disabled = !isMyTurn;
+                $("btnReset").disabled = !(state?.ownerUid === myUid);
+            });
+        }
+
+        function enableGameButtons(enabled) {
+            // roll/end are controlled by turn; this just unlocks UI after connect
+            $("btnRoll").disabled = !enabled;
+            $("btnEnd").disabled = !enabled;
+            $("btnReset").disabled = !enabled;
+        }
+
+        async function roll() {
+            if (!room) return;
+            const d1 = randInt(1, 6), d2 = randInt(1, 6);
+            const sum = d1 + d2;
+
+            await runTransaction(roomRef, (state) => {
+                if (!state) return state;
+                if (state.turnUid !== myUid) return state;
+
+                const me = state.players?.[myUid];
+                if (!me) return state;
+
+                const nextPos = ((me.pos || 0) + sum) % 60;
+                me.pos = nextPos;
+
+                state.lastRoll = `${d1}+${d2}=${sum}`;
+                state.players[myUid] = me;
+                return state;
+            });
+
+            log(`🎲 You rolled ${d1} + ${d2} = ${sum}`, "warnTxt");
+        }
+
+        async function endTurn() {
+            if (!room) return;
+
+            await runTransaction(roomRef, (state) => {
+                if (!state) return state;
+                if (state.turnUid !== myUid) return state;
+
+                const ids = Object.keys(state.players || {});
+                if (ids.length < 2) return state;
+
+                // rotate by join order
+                const list = ids
+                    .map(uid => state.players[uid])
+                    .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0))
+                    .map(p => p.uid);
+
+                const i = list.indexOf(state.turnUid);
+                const next = list[(i + 1) % list.length];
+                state.turnUid = next;
+                return state;
+            });
+
+            log(`➡️ Ended turn.`, "warnTxt");
+        }
+
+        async function resetGame() {
+            if (!room) return;
+            await runTransaction(roomRef, (state) => {
+                if (!state) return state;
+                if (state.ownerUid !== myUid) return state;
+
+                // reset positions + cash to their chosen starting cash (keep avatars)
+                for (const uid of Object.keys(state.players || {})) {
+                    state.players[uid].pos = 0;
+                    // keep cash as-is (or reset if you want):
+                    // state.players[uid].cash = state.players[uid].cashStart ?? state.players[uid].cash;
+                }
+                state.turnUid = state.ownerUid;
+                state.lastRoll = null;
+                return state;
+            });
+            log(`♻️ Game reset by host.`, "warnTxt");
+        }
+
+        async function copyCode() {
+            const code = ($("roomCode").value || "").trim();
+            if (!code) return;
+            try {
+                await navigator.clipboard.writeText(code);
+                log(`📋 Copied room code: ${code}`, "goodTxt");
+            } catch {
+                log(`Copy failed. Manually share: ${code}`, "warnTxt");
+            }
+        }
+
+        // ---------- Wire UI ----------
+        $("btnCreate").addEventListener("click", createRoom);
+        $("btnJoin").addEventListener("click", joinRoom);
+        $("btnRoll").addEventListener("click", roll);
+        $("btnEnd").addEventListener("click", endTurn);
+        $("btnReset").addEventListener("click", resetGame);
+        $("btnCopy").addEventListener("click", copyCode);
+
+        renderHotspots();
+        log("Ready. Add Firebase config (Step 3), then Create Room.", "warnTxt");
+    </script>
+
+  
+    <!-- STEP 3 puts config here -->
+    <script>
         window.__FIREBASE_CONFIG__ = {
             apiKey: "AIzaSyC0vtVUiftBEWSoIzU1Ewfyyh0uPUkM",
-        authDomain: "apartment-tycoon.firebaseapp.com",
-        databaseURL: "https://apartment-tycoon-default-rtdb.firebaseio.com",
-        projectId: "apartment-tycoon",
-        storageBucket: "apartment-tycoon.appspot.com",
-        messagingSenderId: "398055726858",
-        appId: "1:398055726858:web:0847944b24edbc03ece4f3"
-  };
-</script>;
+            authDomain: "apartment-tycoon.firebaseapp.com",
+            databaseURL: "https://apartment-tycoon-default-rtdb.firebaseio.com",
+            projectId: "apartment-tycoon",
+            storageBucket: "apartment-tycoon.appspot.com",
+            messagingSenderId: "398055726858",
+            appId: "1:398055726858:web:0847944b24edbc03ece4f3"
+        };
+    </script>
 
 </body>
 </html>
