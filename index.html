@@ -402,38 +402,66 @@
         }
 
         async function createRoom() {
-            await ensureSignedIn();
-            const code = makeRoomCode();
-            room = code;
-            $("roomCode").value = code;
-            roomRef = ref(db, `rooms/${code}`);
+            try {
+                await ensureSignedIn();
 
-            const prof = myProfile();
-
-            // Create room state
-            const init = {
-                createdAt: Date.now(),
-                ownerUid: myUid,
-                turnUid: myUid,
-                lastRoll: null,
-                started: true,
-                players: {
-                    [myUid]: {
-                        uid: myUid,
-                        name: prof.name,
-                        icon: prof.icon,
-                        color: prof.color,
-                        cash: prof.cash,
-                        pos: 0,
-                        joinedAt: Date.now()
-                    }
+                // HARD GUARDS (these prevent "nothing happened" situations)
+                if (!window.__db && typeof db === "undefined") {
+                    throw new Error("db is not defined. Firebase DB init didn't run.");
                 }
-            };
+                const _db = window.__db || db;
 
-            await set(roomRef, init);
-            log(`✅ Room created: ${code}. Share this code.`, "goodTxt");
-            attachRoomListener();
-            enableGameButtons(true);
+                if (!window.myUid && typeof myUid === "undefined") {
+                    throw new Error("myUid is not defined. ensureSignedIn() didn't set it.");
+                }
+                const uid = window.myUid || myUid;
+                if (!uid) throw new Error("Auth UID is empty after ensureSignedIn().");
+
+                const code = makeRoomCode().toUpperCase();
+                room = code;
+
+                const roomCodeEl = $("roomCode");
+                if (!roomCodeEl) throw new Error('Missing element: id="roomCode"');
+                roomCodeEl.value = code;
+
+                // IMPORTANT: use a real template string (backticks), not quotes
+                roomRef = ref(_db, `rooms/${code}`);
+
+                const prof = myProfile();
+                const init = {
+                    createdAt: Date.now(),
+                    ownerUid: uid,
+                    turnUid: uid,
+                    lastRoll: null,
+                    started: true,
+                    players: {
+                        [uid]: {
+                            uid,
+                            name: prof.name,
+                            icon: prof.icon,
+                            color: prof.color,
+                            cash: prof.cash,
+                            pos: 0,
+                            joinedAt: Date.now(),
+                        },
+                    },
+                };
+
+                console.log("[createRoom] writing:", { path: `rooms/${code}`, init });
+
+                await set(roomRef, init);
+
+                // VERIFY write (removes doubt)
+                const snap = await get(roomRef);
+                console.log("[createRoom] wrote OK? exists=", snap.exists(), "val=", snap.val());
+
+                log(`✅ Room created: ${code}. Share this code.`, "goodTxt");
+                attachRoomListener();
+                enableGameButtons(true);
+            } catch (e) {
+                console.error("[createRoom] FAILED:", e);
+                log(`❌ Create room failed: ${e?.message || e}`, "badTxt");
+            }
         }
 
         async function joinRoom() {
