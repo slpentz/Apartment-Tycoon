@@ -230,21 +230,18 @@
     </script>
 
     <script type="module">
-        // ---------- Firebase (add your config in STEP 3 below) ----------
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import {
-            getDatabase, ref, set, get, update, onValue, push, serverTimestamp, runTransaction
-        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-        import {
-            getAuth, signInAnonymously, onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { initializeApp } from "https:/ / www.gstatic.com / firebasejs / 10.12.5 / firebase - app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 
         const firebaseConfig = window.__FIREBASE_CONFIG__;
-        if (!firebaseConfig?.apiKey) throw new Error("Missing firebase config");
-       
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);   // ✅ ONLY ONCE
         const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // optional: expose for debugging
+        window.__app = app;
+        window.__db = db;
 
         // ---------- Utilities ----------
         const $ = (id) => document.getElementById(id);
@@ -580,20 +577,6 @@
         renderHotspots();
         log("Ready. Add Firebase config (Step 3), then Create Room.", "warnTxt");
     </script>
-
-
-    <!-- STEP 3: Firebase config -->
-    <script>
-        window.__FIREBASE_CONFIG__ = {
-            apiKey: "AIzaSyC0vtVUiftBEWSoIzU1Ewfyh0uPUkM",
-            authDomain: "apartment-tycoon.firebaseapp.com",
-            databaseURL: "https://apartment-tycoon-default-rtdb.firebaseio.com",
-            projectId: "apartment-tycoon",
-            storageBucket: "apartment-tycoon.appspot.com",
-            messagingSenderId: "398055726858",
-            appId: "1:398055726858:web:0847944b24edbc03ece4f3"
-        };
-    </script>
-
+       
 </body>
 </html>
