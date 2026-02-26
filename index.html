@@ -255,9 +255,16 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // optional: expose for debugging
+        // expose for debugging (and for any non-module calls, if they exist)
         window.__app = app;
+        window.__auth = auth;
         window.__db = db;
+
+        // expose auth helpers too (optional but helps a LOT while testing)
+        window.__signInAnonymously = signInAnonymously;
+        window.__onAuthStateChanged = onAuthStateChanged;
+
+        console.log("✅ Firebase module initialized", { app, auth, db });
 
         // ---------- Utilities ----------
         const $ = (id) => document.getElementById(id);
@@ -410,7 +417,7 @@
                 myUid = auth.currentUser.uid;
                 return myUid;
             }
-            const cred = await signInAnonymously(auth);
+            const cred = await window.__signInAnonymously(auth);
             myUid = cred.user.uid;
             return myUid;
         }
