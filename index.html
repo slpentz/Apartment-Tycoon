@@ -231,8 +231,24 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-        import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+        import {
+            getDatabase,
+            ref,
+            set,
+            get,
+            update,
+            onValue,
+            push,
+            serverTimestamp,
+            runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 
         const firebaseConfig = window.__FIREBASE_CONFIG__;
         const app = initializeApp(firebaseConfig);   // ✅ ONLY ONCE
@@ -390,13 +406,10 @@
         }
 
         async function ensureSignedIn() {
-            // already signed in?
             if (auth.currentUser?.uid) {
                 myUid = auth.currentUser.uid;
                 return myUid;
             }
-
-            // sign in
             const cred = await signInAnonymously(auth);
             myUid = cred.user.uid;
             return myUid;
